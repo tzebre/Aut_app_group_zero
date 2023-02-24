@@ -41,12 +41,14 @@ class Application(ctk.CTk):
         right.grid_columnconfigure(0, weight=1, uniform="group1")
         btm = tk.Frame(right, bg="pink")
         btm.grid(row=0, column=0, sticky="nsew")
+        photo = {0:{}, 1:{}}
         for r in range(2):
             btm.grid_rowconfigure(r, weight=1)
             for c in range(3):
                 btm.grid_columnconfigure(c, weight=1, uniform="group1")
-                photo = tk.Frame(btm, bg=color[r][c])
-                photo.grid(row=r, column=c, sticky="nsew")
+                photo[r][c] = tk.Frame(btm, bg=color[r][c])
+                photo[r][c].grid(row=r, column=c, sticky="nsew")
+        print(photo)
 
 app = Application()
 app.mainloop()
