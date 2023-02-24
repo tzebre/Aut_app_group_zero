@@ -16,4 +16,9 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-      - run : docker build -t python-imdb .
+      - name: echo "install pipreqs"
+        run: pip install pipreqs
+      - name: echo "make requirement"
+        run: pipreqs --force  ./
+      - name : echo "🛠️ Build docker image"
+        run : docker build -t python-imdb .
