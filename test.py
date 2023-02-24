@@ -1,8 +1,5 @@
-import numpy as np
-import torch
 import tkinter as tk
 import customtkinter as ctk
-import math
 class Application(ctk.CTk):
     """
     class principale de gestion de l'application
@@ -16,6 +13,7 @@ class Application(ctk.CTk):
         super().__init__()
         self.title("")
         self.info()
+        self.make_frame()
     def info(self):
         w = self.winfo_screenwidth()
         h = self.winfo_screenheight()
@@ -23,8 +21,32 @@ class Application(ctk.CTk):
         size_h = (3 / 4) * size_w
         self.window_height = int(size_h)
         self.window_width = int(size_w)
-        x = w // 2 - size_w // 2
-        y = h // 2 - size_h // 2
-        self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, int(x), int(y)))
+        x = 0
+        y = 0
+
+        #self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, int(x), int(y)))
+        self.geometry("{}x{}+{}+{}".format(w, h, int(x), int(y)))
+
+    def make_frame(self):
+        self.grid_columnconfigure(0, weight=1, uniform="group1")
+        self.grid_columnconfigure(1, weight=5, uniform="group1")
+        self.grid_rowconfigure(0, weight=1)
+        left = tk.Frame(self, bg="red")
+        right = tk.Frame(self, bg="blue")
+        left.grid(row=0, column=0, sticky="nsew")
+        right.grid(row=0, column=1,sticky="nsew")
+        color = [["green", "yellow", "orange"],["orange","green", "yellow"]]
+        right.grid_rowconfigure(0, weight=10, uniform="group1")
+        right.grid_rowconfigure(1, weight=1, uniform="group1")
+        right.grid_columnconfigure(0, weight=1, uniform="group1")
+        btm = tk.Frame(right, bg="pink")
+        btm.grid(row=0, column=0, sticky="nsew")
+        for r in range(2):
+            btm.grid_rowconfigure(r, weight=1)
+            for c in range(3):
+                btm.grid_columnconfigure(c, weight=1, uniform="group1")
+                photo = tk.Frame(btm, bg=color[r][c])
+                photo.grid(row=r, column=c, sticky="nsew")
+
 app = Application()
 app.mainloop()
