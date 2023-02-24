@@ -1,6 +1,6 @@
-name: GitHub push
+name: GitHub pull
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+on: [pull]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
@@ -16,9 +16,5 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-      - name: echo "install pipreqs"
-        run: pip install pipreqs
-      - name: echo "make requirement"
-        run: pipreqs --force  ./
       - name : echo "🛠️ Build docker image"
         run : docker build -t python-project .
