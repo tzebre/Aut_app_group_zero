@@ -13,6 +13,7 @@ class Application(ctk.CTk):
         super().__init__()
         self.title("")
         self.info()
+        self.photo_frame = {}
         self.make_frame()
     def info(self):
         w = self.winfo_screenwidth()
@@ -41,14 +42,13 @@ class Application(ctk.CTk):
         right.grid_columnconfigure(0, weight=1, uniform="group1")
         btm = tk.Frame(right, bg="pink")
         btm.grid(row=0, column=0, sticky="nsew")
-        photo = {0:{}, 1:{}}
+        self.photo_frame = {0:{}, 1:{}}
         for r in range(2):
             btm.grid_rowconfigure(r, weight=1)
             for c in range(3):
                 btm.grid_columnconfigure(c, weight=1, uniform="group1")
-                photo[r][c] = tk.Frame(btm, bg=color[r][c])
-                photo[r][c].grid(row=r, column=c, sticky="nsew")
-        print(photo)
+                self.photo_frame[r][c] = tk.Frame(btm, bg=color[r][c])
+                self.photo_frame[r][c].grid(row=r, column=c, sticky="nsew")
 
 app = Application()
 app.mainloop()
