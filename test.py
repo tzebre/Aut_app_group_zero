@@ -155,8 +155,8 @@ class Application(ctk.CTk):
         self.grid_columnconfigure(0, weight=1, uniform="group1")
         self.grid_columnconfigure(1, weight=5, uniform="group1")
         self.grid_rowconfigure(0, weight=1)
-        right = tk.Frame(self, bg="blue")
-        left = tk.Frame(self, bg="red")
+        right = tk.Frame(self)
+        left = tk.Frame(self)
         left.grid(row=0, column=0, sticky="nsew")
         left.grid_columnconfigure(0, weight=1)
         left.grid_rowconfigure(0, weight=1)
@@ -218,7 +218,7 @@ class Application(ctk.CTk):
         """
         self.entropy_value.configure(text=f"entropy : {val:.02f}")
 
-    def button_click(self, coords):
+    def button_click(self,coords):
         """Change l'état d'un bouton de photo lorsqu'il est cliqué.
 
                 Args:
