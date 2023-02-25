@@ -10,7 +10,7 @@ import shutil
 
 img_path = "img/"
 last_path = "past/"
-
+fun = True
 
 def random_img():
     """
@@ -185,14 +185,18 @@ class Application(ctk.CTk):
         btm.columnconfigure(1, weight=2, uniform="group1")
         btm.columnconfigure(2, weight=1, uniform="group2")
         btm.columnconfigure(3, weight=1, uniform="group2")
+        if fun:
+            self.end_btn = ctk.CTkButton(btm, text="Validation finale", command=self.end_gif)
+        else:
+            self.end_btn = ctk.CTkButton(btm, text="Validation finale", command=self.end)
+        self.end_btn.grid(row=0, column=3)
         self.entropy_slider = ctk.CTkSlider(master=btm, from_=0, to=100, command=self.change_value)
         self.entropy_slider.grid(row=0, column=0, sticky="nsew")
         self.entropy_value = ctk.CTkLabel(master=btm, text=f"entropy : {self.entropy_slider.get():.02f}")
         self.entropy_value.grid(row=0, column=1, sticky="nsew")
         next = ctk.CTkButton(btm, text="Next", command=self.next)
         next.grid(row=0, column=2)
-        end = ctk.CTkButton(btm, text="Validation finale", command=self.end)
-        end.grid(row=0, column=3)
+
         for r in range(2):
             top.grid_rowconfigure(r, weight=1)
             if r == 0:
@@ -246,6 +250,7 @@ class Application(ctk.CTk):
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
             self.selected_source = focus_btn["source"]
+            self.end_btn.configure(state="normal")
 
     def next(self):
         self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
@@ -262,6 +267,10 @@ class Application(ctk.CTk):
             cliqué.
 
         """
+        try:
+            self.end_btn.configure(state="disabled")
+        except:
+            pass
         for r in range(2):
             for c in range(3):
                 self.photo_frame[r][c]['btn'].configure(fg_color="grey")
@@ -326,10 +335,8 @@ class Application(ctk.CTk):
         self.gif_frame.configure(image=None)
         self.frames = None
         self.gif_frame.destroy()
-        export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
-                                     compound="bottom",
-                                     text="export image", fg_color="darkgrey", hover_color="grey")
-        export_image.grid(row=0, column=0)
+        self.toplevel.destroy()
+        self.end()
 
     def end(self):
         self.toplevel = tk.Toplevel(self)
