@@ -8,7 +8,7 @@ Authors :
 
 Exporter un environnement Conda
 ```
-	conda env export --no-build > environment.yml
+	conda env export > environment.yml
 ```
  	 
 Supression de l'environnement et re-creation de l'environnement
