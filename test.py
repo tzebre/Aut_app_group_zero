@@ -1,8 +1,10 @@
+import time
 import tkinter as tk
 import customtkinter as ctk
-from PIL import Image
+from PIL import Image, ImageTk
 import glob
 import random
+from itertools import count, cycle
 
 img_path = "img/*.jpg"
 
@@ -46,8 +48,11 @@ def convert_photoimg(source, size):
         Returns:
             tkinter.PhotoImage: Objet PhotoImage de l'image convertie et redimensionnée.
         """
-    photo_image = ctk.CTkImage(light_image=Image.open(source), dark_image=Image.open(source),
-                               size=(size[0], size[1]))
+    if size == None:
+        photo_image = ctk.CTkImage(light_image=Image.open(source), dark_image=Image.open(source))
+    else:
+        photo_image = ctk.CTkImage(light_image=Image.open(source), dark_image=Image.open(source),
+                                   size=(size[0], size[1]))
     return photo_image
 
 
@@ -107,6 +112,7 @@ class Application(ctk.CTk):
         self.window_width = None
         self.entropy_slider = None
         self.entropy_value = None
+        self.selected_source = None
         self.title("zero")
         self.info()
         self.make_frame()
@@ -175,9 +181,9 @@ class Application(ctk.CTk):
         self.entropy_slider.grid(row=0, column=0, sticky="nsew")
         self.entropy_value = ctk.CTkLabel(master=btm, text=f"entropy : {self.entropy_slider.get():.02f}")
         self.entropy_value.grid(row=0, column=1, sticky="nsew")
-        next = ctk.CTkButton(btm, text="Next", command= self.next)
+        next = ctk.CTkButton(btm, text="Next", command=self.next)
         next.grid(row=0, column=2)
-        end = ctk.CTkButton(btm, text="Validation finale")
+        end = ctk.CTkButton(btm, text="Validation finale", command=self.end)
         end.grid(row=0, column=3)
         for r in range(2):
             top.grid_rowconfigure(r, weight=1)
@@ -231,18 +237,12 @@ class Application(ctk.CTk):
             self.unselect_all()
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
-
+            self.selected_source = focus_btn["source"]
 
     def next(self):
-        source = None
-        for line in Application.photo_frame.values():
-            for col in line.values():
-                if col["clicked"] :
-                    source = col["source"]
-        self.scroll_left.add_img(source, (self.w_past, self.h_past))
+        self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
         self.unselect_all()
         Application.new_image()
-
 
     def unselect_all(self):
         """
@@ -275,7 +275,61 @@ class Application(ctk.CTk):
                 source = random_img()
                 Application.photo_frame[r][c]['source'] = source
                 Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-                                                        compound='top')
+                                                               compound='top')
+
+    def end_gif(self):
+        self.toplevel = tk.Toplevel(self)
+        self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
+        self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
+        self.gif_frame = ctk.CTkButton(self.toplevel, image=convert_photoimg("gif/output_0.png", None),
+                                       compound="bottom",
+                                       text="next", command=self.end_anim, fg_color="darkgrey", hover_color="grey")
+        self.gif_frame.grid(row=0, column=0)
+        im = "gif/police-dance.gif"
+        if isinstance(im, str):
+            im = Image.open(im)
+        frames = []
+
+        try:
+            for i in count(1):
+                frames.append(ImageTk.PhotoImage(im.copy()))
+                im.seek(i)
+        except EOFError:
+            pass
+        self.frames = cycle(frames)
+
+        try:
+            self.delay = im.info['duration']
+        except:
+            self.delay = 100
+
+        if len(frames) == 1:
+            self.gif_frame.configure(image=next(self.frames))
+        else:
+            self.next_frame()
+
+    def next_frame(self):
+        if self.frames:
+            self.gif_frame.configure(image=next(self.frames))
+            self.after(self.delay, self.next_frame)
+
+    def end_anim(self):
+        self.gif_frame.configure(image=None)
+        self.frames = None
+        self.gif_frame.destroy()
+        export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
+                                     compound="bottom",
+                                     text="export image", fg_color="darkgrey", hover_color="grey")
+        export_image.grid(row=0, column=0)
+
+    def end(self):
+        self.toplevel = tk.Toplevel(self)
+        self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
+        self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
+        export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
+                                     compound="bottom",
+                                     text="export image", fg_color="darkgrey", hover_color="grey")
+        export_image.grid(row=0, column=0)
 
 
 app = Application()
