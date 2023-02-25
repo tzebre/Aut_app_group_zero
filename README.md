@@ -6,12 +6,17 @@ Authors :
 - OHAYON Quentin @Quentinohn
 - MATHIEU Théo @tzebre
 
-export env 
- 	conda env export > environment.yml 
- Creation env 
- 	conda remove -n soft_dev
+Exporter un environnement Conda
+```
+	conda env export > environment.yml
+```
+ 	 
+Supression de l'environnement et re-creation de l'environnement
+```
+	conda remove -n soft_dev
 	conda env create -n soft_dev -f environment.yml
-	conda activate soft_dev
+```
  Activation 
- 	conda activate soft_dev
-
+```
+	conda activate soft_dev
+```
