@@ -146,7 +146,6 @@ class Application(ctk.CTk):
                 self.size_photo = (w, h)
         self.new_image()
     def change_value(self, val):
-        print(val)
         self.entropy_value.configure(text = f"entropy : {val:.02f}")
     def button_click(self, coords):
         r = coords[0]
