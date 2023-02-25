@@ -16,7 +16,6 @@ def random_img():
         """
     images = glob.glob(random.choice([img_path]))
     random_image = random.choice(images)
-    print(random_image)
     return random_image
 
 
@@ -89,15 +88,15 @@ class Pastchoice(ctk.CTkScrollableFrame):
                 None
         """
         self.count = count
-        print(count)
         for i in range(count + 1, len(self.all_past) + 1):
-            print(i)
             self.all_past[i].destroy()
             self.all_past.pop(i)
-        # comment relancer un placmement d'image depuis cette classe ?
+        Application.new_image()
 
 
 class Application(ctk.CTk):
+    photo_frame = {0: {}, 1: {}}
+    size_photo = None
 
     def __init__(self):
         super().__init__()
@@ -106,12 +105,10 @@ class Application(ctk.CTk):
         self.scroll_left = None
         self.window_height = None
         self.window_width = None
-        self.size_photo = None
         self.entropy_slider = None
         self.entropy_value = None
         self.title("zero")
         self.info()
-        self.photo_frame = {}
         self.make_frame()
 
     def info(self):
@@ -173,13 +170,15 @@ class Application(ctk.CTk):
         btm.columnconfigure(0, weight=2, uniform="group1")
         btm.columnconfigure(1, weight=2, uniform="group1")
         btm.columnconfigure(2, weight=1, uniform="group2")
+        btm.columnconfigure(3, weight=1, uniform="group2")
         self.entropy_slider = ctk.CTkSlider(master=btm, from_=0, to=100, command=self.change_value)
         self.entropy_slider.grid(row=0, column=0, sticky="nsew")
         self.entropy_value = ctk.CTkLabel(master=btm, text=f"entropy : {self.entropy_slider.get():.02f}")
         self.entropy_value.grid(row=0, column=1, sticky="nsew")
+        next = ctk.CTkButton(btm, text="Next", command= self.next)
+        next.grid(row=0, column=2)
         end = ctk.CTkButton(btm, text="Validation finale")
-        end.grid(row=0, column=2)
-        self.photo_frame = {0: {}, 1: {}}
+        end.grid(row=0, column=3)
         for r in range(2):
             top.grid_rowconfigure(r, weight=1)
             if r == 0:
@@ -194,15 +193,15 @@ class Application(ctk.CTk):
                 else:
                     padx = (10, 5)
                 top.grid_columnconfigure(c, weight=1, uniform="group1")
-                self.photo_frame[r][c] = {
+                Application.photo_frame[r][c] = {
                     'btn': ctk.CTkButton(top, fg_color="grey", hover_color="palegreen",
                                          command=lambda coords=(r, c): self.button_click(coords), text="_"),
                     'clicked': False, 'order': None, 'source': ""}
-                self.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
+                Application.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
                 w, h = get_frame_size(right)
                 w = w // 3.5
                 h = h // 2.5
-                self.size_photo = (w, h)
+                Application.size_photo = (w, h)
         self.new_image()
 
     def change_value(self, val):
@@ -232,8 +231,18 @@ class Application(ctk.CTk):
             self.unselect_all()
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
-            self.scroll_left.add_img(focus_btn['source'], (self.w_past, self.h_past))
-            self.new_image()
+
+
+    def next(self):
+        source = None
+        for line in Application.photo_frame.values():
+            for col in line.values():
+                if col["clicked"] :
+                    source = col["source"]
+        self.scroll_left.add_img(source, (self.w_past, self.h_past))
+        self.unselect_all()
+        Application.new_image()
+
 
     def unselect_all(self):
         """
@@ -249,7 +258,8 @@ class Application(ctk.CTk):
                 self.photo_frame[r][c]['btn'].configure(fg_color="grey")
                 self.photo_frame[r][c]['clicked'] = False
 
-    def new_image(self):
+    @classmethod
+    def new_image(cls):
         """
         Génère de nouvelles images pour chaque bouton de la grille photo.
 
@@ -259,12 +269,12 @@ class Application(ctk.CTk):
             Returns:
                 Aucun.
         """
+        cls.unselect_all(cls)
         for r in range(2):
             for c in range(3):
                 source = random_img()
-                print(source)
-                self.photo_frame[r][c]['source'] = source
-                self.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, self.size_photo),
+                Application.photo_frame[r][c]['source'] = source
+                Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
                                                         compound='top')
 
 
