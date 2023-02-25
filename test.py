@@ -1,4 +1,3 @@
-import time
 import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageTk
@@ -12,6 +11,7 @@ img_path = "img/"
 last_path = "past/"
 fun = True
 
+
 def random_img():
     """
         Retourne une image aléatoire parmi une liste d'images.
@@ -19,7 +19,7 @@ def random_img():
         Returns:
             str: Chemin d'accès vers l'image aléatoire sélectionnée.
         """
-    images = glob.glob(random.choice([img_path+"*.jpg"]))
+    images = glob.glob(random.choice([img_path + "*.jpg"]))
     random_image = random.choice(images)
     return random_image
 
@@ -51,7 +51,7 @@ def convert_photoimg(source, size):
         Returns:
             tkinter.PhotoImage: Objet PhotoImage de l'image convertie et redimensionnée.
         """
-    if size == None:
+    if size is None:
         photo_image = ctk.CTkImage(light_image=Image.open(source), dark_image=Image.open(source))
     else:
         photo_image = ctk.CTkImage(light_image=Image.open(source), dark_image=Image.open(source),
@@ -78,28 +78,28 @@ class Pastchoice(ctk.CTkScrollableFrame):
         """
         self.count += 1
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
-                            command=lambda count=self.count, source=source_img: self.go_past(count, source),
+                            command=lambda cnt=self.count, source=source_img: self.go_past(cnt, source),
                             image=convert_photoimg(source_img, size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
         new_path = source_img.split("/")[1]
-        Image.open(source_img).save(last_path+new_path)
+        Image.open(source_img).save(last_path + new_path)
 
-        self.all_past[self.count] = [old, last_path+new_path]
+        self.all_past[self.count] = [old, last_path + new_path]
 
-    def go_past(self, count, source):
+    def go_past(self, cnt, source):
         """
             Efface tous les boutons d'images qui se trouvent après le bouton sélectionné.
 
             Args:
-                count (int): Numéro du bouton sélectionné.
+                cnt (int): Numéro du bouton sélectionné.
                 source (str): Chemin d'accès vers l'image source associée au bouton sélectionné.
 
             Returns:
                 None
         """
-        self.count = count
-        for i in range(count + 1, len(self.all_past) + 1):
+        self.count = cnt
+        for i in range(self.count + 1, len(self.all_past) + 1):
             self.all_past[i][0].destroy()
             path = self.all_past[i][1]
             if os.path.exists(path):
@@ -115,34 +115,34 @@ class Application(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+        self.delay = None
+        self.toplevel = None
+        self.end_btn = None
         self.h_past = None
         self.w_past = None
         self.scroll_left = None
-        self.window_height = None
-        self.window_width = None
         self.entropy_slider = None
         self.entropy_value = None
         self.selected_source = None
+        self.gif_frame = None
+        self.frames = None
+
         self.title("zero")
         self.info()
         self.make_frame()
 
     def info(self):
         """
-            Détermine les dimensions de la fenêtre en fonction des dimensions de l'écran et positionne la fenêtre en haut à gauche de l'écran.
+            Détermine les dimensions de la fenêtre en fonction des dimensions de l'écran et positionne la fenêtre en
+            haut à gauche de l'écran.
 
             Args:
-                None
 
             Returns:
                 None
             """
         w = self.winfo_screenwidth()
         h = self.winfo_screenheight()
-        size_w = min((4 / 3) * h, w)
-        size_h = (3 / 4) * size_w
-        self.window_height = int(size_h)
-        self.window_width = int(size_w)
         x = 0
         y = 0
         self.geometry("{}x{}+{}+{}".format(w, h, int(x), int(y)))
@@ -153,8 +153,10 @@ class Application(ctk.CTk):
 
             Cette méthode configure les colonnes et les rangées de la frame principale, puis crée deux sous-frames :
             une frame "left" et une frame "right".
-            La frame "left" contient un widget "Pastchoice" qui permet à l'utilisateur de naviguer parmi les images déjà traitées.
-            La frame "right" contient une sous-frame "top" et une sous-frame "btm". La sous-frame "top" est utilisée pour afficher les images
+            La frame "left" contient un widget "Pastchoice" qui permet à l'utilisateur de naviguer parmi les images
+            déjà traitées.
+            La frame "right" contient une sous-frame "top" et une sous-frame "btm". La sous-frame "top" est utilisée
+            pour afficher les images
             traitées et la sous-frame "btm" contient un slider, un label et un bouton de validation.
 
             Returns:
@@ -194,8 +196,8 @@ class Application(ctk.CTk):
         self.entropy_slider.grid(row=0, column=0, sticky="nsew")
         self.entropy_value = ctk.CTkLabel(master=btm, text=f"entropy : {self.entropy_slider.get():.02f}")
         self.entropy_value.grid(row=0, column=1, sticky="nsew")
-        next = ctk.CTkButton(btm, text="Next", command=self.next)
-        next.grid(row=0, column=2)
+        next_btn = ctk.CTkButton(btm, text="Next", command=self.next)
+        next_btn.grid(row=0, column=2)
 
         for r in range(2):
             top.grid_rowconfigure(r, weight=1)
@@ -230,7 +232,7 @@ class Application(ctk.CTk):
         """
         self.entropy_value.configure(text=f"entropy : {val:.02f}")
 
-    def button_click(self,coords):
+    def button_click(self, coords):
         """Change l'état d'un bouton de photo lorsqu'il est cliqué.
 
                 Args:
@@ -271,6 +273,7 @@ class Application(ctk.CTk):
             self.end_btn.configure(state="disabled")
         except:
             pass
+
         for r in range(2):
             for c in range(3):
                 self.photo_frame[r][c]['btn'].configure(fg_color="grey")
@@ -347,13 +350,13 @@ class Application(ctk.CTk):
                                      text="export image", fg_color="darkgrey", hover_color="grey")
         export_image.grid(row=0, column=0)
 
-for dir in [last_path]:
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    else:
-        shutil.rmtree(dir)
-        os.makedirs(dir)
 
+for dir_path in [last_path]:
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    else:
+        shutil.rmtree(dir_path)
+        os.makedirs(dir_path)
 
 app = Application()
 app.mainloop()
