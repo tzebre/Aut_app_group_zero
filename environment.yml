@@ -37,4 +37,3 @@ dependencies:
   - pip:
       - customtkinter==5.1.2
       - darkdetect==0.8.0
-prefix: /Users/theomathieu/miniconda3/envs/dev_log2
