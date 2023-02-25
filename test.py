@@ -5,8 +5,11 @@ from PIL import Image, ImageTk
 import glob
 import random
 from itertools import count, cycle
+import os
+import shutil
 
-img_path = "img/*.jpg"
+img_path = "img/"
+last_path = "past/"
 
 
 def random_img():
@@ -16,7 +19,7 @@ def random_img():
         Returns:
             str: Chemin d'accès vers l'image aléatoire sélectionnée.
         """
-    images = glob.glob(random.choice([img_path]))
+    images = glob.glob(random.choice([img_path+"*.jpg"]))
     random_image = random.choice(images)
     return random_image
 
@@ -79,7 +82,10 @@ class Pastchoice(ctk.CTkScrollableFrame):
                             image=convert_photoimg(source_img, size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
-        self.all_past[self.count] = old
+        new_path = source_img.split("/")[1]
+        Image.open(source_img).save(last_path+new_path)
+
+        self.all_past[self.count] = [old, last_path+new_path]
 
     def go_past(self, count, source):
         """
@@ -94,8 +100,12 @@ class Pastchoice(ctk.CTkScrollableFrame):
         """
         self.count = count
         for i in range(count + 1, len(self.all_past) + 1):
-            self.all_past[i].destroy()
+            self.all_past[i][0].destroy()
+            path = self.all_past[i][1]
+            if os.path.exists(path):
+                os.remove(path)
             self.all_past.pop(i)
+
         Application.new_image()
 
 
@@ -135,8 +145,6 @@ class Application(ctk.CTk):
         self.window_width = int(size_w)
         x = 0
         y = 0
-
-        # self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, int(x), int(y)))
         self.geometry("{}x{}+{}+{}".format(w, h, int(x), int(y)))
 
     def make_frame(self):
@@ -242,6 +250,7 @@ class Application(ctk.CTk):
     def next(self):
         self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
         self.unselect_all()
+        self.selected_source = None
         Application.new_image()
 
     def unselect_all(self):
@@ -330,6 +339,13 @@ class Application(ctk.CTk):
                                      compound="bottom",
                                      text="export image", fg_color="darkgrey", hover_color="grey")
         export_image.grid(row=0, column=0)
+
+for dir in [last_path]:
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    else:
+        shutil.rmtree(dir)
+        os.makedirs(dir)
 
 
 app = Application()
