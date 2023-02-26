@@ -2,10 +2,10 @@ import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import glob
-import random
 from itertools import count, cycle
 import os
 import shutil
+import random
 
 img_path = "img/"
 last_path = "past/"
@@ -126,7 +126,6 @@ class Application(ctk.CTk):
         self.selected_source = None
         self.gif_frame = None
         self.frames = None
-
         self.title("zero")
         self.info()
         self.make_frame()
@@ -238,7 +237,7 @@ class Application(ctk.CTk):
                 Args:
                     coords (tuple): Les coordonnées du bouton de photo cliqué.
 
-                Returns:
+                Returns :
                     None
         """
         r = coords[0]
@@ -271,8 +270,8 @@ class Application(ctk.CTk):
         """
         try:
             self.end_btn.configure(state="disabled")
-        except:
-            pass
+        except AttributeError:
+            print("end_btn does not exist yet")
 
         for r in range(2):
             for c in range(3):
@@ -321,7 +320,7 @@ class Application(ctk.CTk):
 
         try:
             self.delay = im.info['duration']
-        except:
+        except ValueError:
             self.delay = 100
 
         if len(frames) == 1:
