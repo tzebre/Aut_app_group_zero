@@ -66,9 +66,15 @@ class Customframe(tk.Frame):
         if ok:
             self.scale_value = {"row": {}, "col": {}}
             try:
+                self.ok_btn.destroy()
+                self.row_entry.destroy()
+                self.col_entry.destroy()
+            except ValueError:
+                print(f"Widget already destroyed")
+            try:
                 self.slider_frame_row.destroy
                 self.slider_frame_col.destroy
-            except ValueError:
+            except AttributeError :
                 print("slider already destroyed")
             self.slider_frame_row = ctk.CTkFrame(master=self.top_level)
             self.slider_frame_row.grid_columnconfigure(0, weight=1)
@@ -109,7 +115,6 @@ class Customframe(tk.Frame):
             self.col_entry.destroy()
         except ValueError:
             print(f"Widget already destroyed")
-            return
         for i, r in enumerate(self.row):
             self.grid_rowconfigure(i, weight=r)
         for i, c in enumerate(self.col):
