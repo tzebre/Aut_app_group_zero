@@ -106,7 +106,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
                 os.remove(path)
             self.all_past.pop(i)
 
-        Application.new_image()
+        Application.new_image(1)
 
 
 class Application(ctk.CTk):
@@ -128,6 +128,7 @@ class Application(ctk.CTk):
         self.frames = None
         self.title("zero")
         self.info()
+        #self.accueil()
         self.make_frame()
 
     def info(self):
@@ -145,6 +146,17 @@ class Application(ctk.CTk):
         x = 0
         y = 0
         self.geometry("{}x{}+{}+{}".format(w, h, int(x), int(y)))
+    # def accueil(self):
+    #     btm = tk.Frame()
+    #     im = Image.open('./file/logo.png')
+    #     logo = ImageTk.PhotoImage(im, master=btm)
+    #
+    #     ##----- Création du canevas et affichage de l'image -----##
+    #     dessin = tk.Canvas(btm, width=im.size[0], height=im.size[1])
+    #     logo1 = dessin.create_image(0, 0, anchor=tk.NW, image=logo)
+    #     dessin.grid()
+    #     lan = ctk.CTkButton(btm, text='Lancer', command=self.make_frame)
+    #     lan.pack(side=ctk.BOTTOM)
 
     def make_frame(self):
         """
@@ -279,7 +291,7 @@ class Application(ctk.CTk):
                 self.photo_frame[r][c]['clicked'] = False
 
     @classmethod
-    def new_image(cls):
+    def new_image(cls, past=0):
         """
         Génère de nouvelles images pour chaque bouton de la grille photo.
 
@@ -290,12 +302,29 @@ class Application(ctk.CTk):
                 Aucun.
         """
         cls.unselect_all(cls)
-        for r in range(2):
-            for c in range(3):
-                source = random_img()
-                Application.photo_frame[r][c]['source'] = source
-                Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-                                                               compound='top')
+        # for r in range(2):
+        #     for c in range(3):
+        #         source = random_img()
+        #         Application.photo_frame[r][c]['source'] = source
+        #         Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
+        #                                                        compound='top')
+        if past == 0:
+            for r in range(2):
+                for c in range(3):
+                    source = random_img()
+                    Application.photo_frame[r][c]['source'] = source
+                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
+                                                                   compound='top')
+        else:
+            for r in range(2):
+                for c in range(3):
+                    if r == 1 and c == 1 :
+                        source = min(glob.glob('past/*.jpg'), key=os.path.getctime)
+
+                    else :
+                        source = random_img()
+                    Application.photo_frame[r][c]['source'] = source
+                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo), compound='top')
 
     def end_gif(self):
         self.toplevel = tk.Toplevel(self)
