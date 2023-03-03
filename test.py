@@ -6,7 +6,8 @@ from itertools import count, cycle
 import os
 import shutil
 import random
-
+from tkinter import messagebox
+ 
 img_path = "img/"
 last_path = "past/"
 fun = True
@@ -283,7 +284,7 @@ class Application(ctk.CTk):
         try:
             self.end_btn.configure(state="disabled")
         except AttributeError:
-            print("end_btn does not exist yet")
+            messagebox.showinfo("Error Message", "end_btn does not exist yet")
 
         for r in range(2):
             for c in range(3):
