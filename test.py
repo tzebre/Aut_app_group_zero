@@ -304,30 +304,12 @@ class Application(ctk.CTk):
                 Aucun.
         """
         cls.unselect_all(cls)
-        # for r in range(2):
-        #     for c in range(3):
-        #         source = random_img()
-        #         Application.photo_frame[r][c]['source'] = source
-        #         Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-        #                                                        compound='top')
-        if past == 0:
-            for r in range(2):
-                for c in range(3):
-                    source = random_img()
-                    Application.photo_frame[r][c]['source'] = source
-                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-                                                                   compound='top')
-        else:
-            for r in range(2):
-                for c in range(3):
-                    if r == 1 and c == 1 :
-                        source = min(glob.glob('past/*.jpg'), key=os.path.getctime)
-
-                    else :
-                        source = random_img()
-                    Application.photo_frame[r][c]['source'] = source
-                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo), compound='top')
-
+        for r in range(2):
+            for c in range(3):
+                source = random_img()
+                Application.photo_frame[r][c]['source'] = source
+                Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
+                                                               compound='top')
     def end_gif(self):
         self.toplevel = tk.Toplevel(self)
         self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
