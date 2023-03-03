@@ -284,7 +284,8 @@ class Application(ctk.CTk):
         try:
             self.end_btn.configure(state="disabled")
         except AttributeError:
-            messagebox.showinfo("Error Message", "end_btn does not exist yet")
+            #messagebox.showinfo("Error Message", "end_btn does not exist yet")
+            pass
 
         for r in range(2):
             for c in range(3):
@@ -388,4 +389,8 @@ for dir_path in [last_path]:
         os.makedirs(dir_path)
 
 app = Application()
+# Load the image file from disk.
+icon = tk.PhotoImage(file="./file/logo.png")
+# Set it as the window icon.
+app.iconphoto(True, icon)
 app.mainloop()
