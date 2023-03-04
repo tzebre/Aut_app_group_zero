@@ -1,6 +1,6 @@
 # architecture : encoder +algo génetique + decoder
 # - Je pense que le système encoder decoder à besoin d'être pretrain, et ensuite on y ajoute au milieu l'algo génetique: encoder+decoder pretrain saura retrouver une image, la reconstituer
-# - Une fois qu'on ajoute l'algo génetique cela reconstruira une image mais modifiée puisqu'on aura changer la matrice en sortie de l'encoder
+# - Une fois qu'on ajoute l'lago génetique cela reconstruira une image mais modifiée puisqu'on aura changer la matrice en sortie de l'encoder
 # Training encoder-decoder
 
 # import library
@@ -19,25 +19,24 @@ import os
 from sklearn.model_selection import train_test_split
 
 ## Ouverture des images et création des dataloaders
-contenu = os.listdir('00000')
+contenu = os.listdir('dataset/60000')
 # print(contenu)
 convert_tensor = transforms.ToTensor()
 dataset = []
-data_dir = "00000"
-
+data_dir = "dataset/60000"
+t = 64
 for i in range(len(contenu)):
-    img_path = os.path.join(data_dir, contenu[i])
-    img = Image.open(img_path)
-    img = img.resize((64, 64))
-    tensor = convert_tensor(img)
-    #print(tensor.shape)
-    #taille des tensor 3*64*64
-    tensor = tensor.unsqueeze(0)
-    print(tensor.shape)
-    dataset.append(tensor)
-
-# print(dataset)
-
+    if contenu[i] != ".DS_Store":
+        img_path = os.path.join(data_dir, contenu[i])
+        img = Image.open(img_path)
+        img = img.resize((64, 64))
+        tensor = convert_tensor(img)
+        #print(tensor.shape)
+        #taille des tensor 3*64*64
+        tensor = tensor.unsqueeze(0)
+        #print(tensor.shape)
+        dataset.append(tensor)
+print(tensor.shape)
 
 
 X_train, X_test = train_test_split(dataset, test_size=0.2, random_state=0)
@@ -81,11 +80,11 @@ class Encoder(torch.nn.Module):
 
     def forward(self, x):
         x = self.encoder(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.flatten(x)
-        print(x.shape)
+        #print(x.shape)
         x = self.encoder_lin(x)
-        print(x.shape)
+       # print(x.shape)
         return x
 
 
@@ -119,12 +118,12 @@ class Decoder(torch.nn.Module):
 
     def forward(self, x):
         x = self.decoder(x)
-        print(x.shape)
+        #print(x.shape)
         x = torch.reshape(x, (3, 3, 8))
         x = x.unsqueeze(0)
-        print(x.shape)
+        #print(x.shape)
         x = self.decoder_next(x)
-        print(x.shape)
+        #print(x.shape)
         return x
 
 
@@ -155,18 +154,19 @@ def train_epoch(encoder, decoder, device, dataloader, loss_fn, optimizer):
     for image_batch in dataloader:  # with "_" we just ignore the labels (the second element of the dataloader tuple)
         # Move tensor to the proper device
         image_batch = image_batch.to(device)
+        #print(image_batch[0].size())
         # Encode data
-        encoded_data = encoder(image_batch)
+        encoded_data = encoder(image_batch[0])
         # Decode data
         decoded_data = decoder(encoded_data)
         # Evaluate loss
-        loss = loss_fn(decoded_data, image_batch)
+        loss = loss_fn(decoded_data, image_batch[0])
         # Backward pass
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         # Print batch loss
-        print('\t partial train loss (single batch): %f' % (loss.data))
+        #print('\t partial train loss (single batch): %f' % (loss.data))
         train_loss.append(loss.detach().cpu().numpy())
 
     return np.mean(train_loss)
@@ -184,7 +184,7 @@ def test_epoch(encoder, decoder, device, dataloader, loss_fn):
             # Move tensor to the proper device
             image_batch = image_batch.to(device)
             # Encode data
-            encoded_data = encoder(image_batch)
+            encoded_data = encoder(image_batch[0])
             # Decode data
             decoded_data = decoder(encoded_data)
             # Append the network output and the original image to the lists
@@ -197,24 +197,32 @@ def test_epoch(encoder, decoder, device, dataloader, loss_fn):
         val_loss = loss_fn(conc_out, conc_label)
     return val_loss.data
 
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
+mpl.use('TkAgg')  # !IMPORTANT
 def plot_ae_outputs(encoder, decoder, n=10):
-    plt.figure(figsize=(16, 4.5))
-    targets = X_test.targets.numpy()
-    t_idx = {i: np.where(targets == i)[0][0] for i in range(n)}
+    plt.figure()
+    #targets = X_test.targets.numpy()
+    print(np.array(X_test).shape)
+    #t_idx = {i: np.where(targets == i)[0][0] for i in range(n)}
     for i in range(n):
         ax = plt.subplot(2, n, i + 1)
-        img = X_test[t_idx[i]][0].to(device)
+        img = X_test[i]
         encoder.eval()
         decoder.eval()
         with torch.no_grad():
             rec_img = decoder(encoder(img))
-        plt.imshow(img.cpu().squeeze().numpy(), cmap='gist_gray')
+        im = img[0].T
+        print(im.shape)
+        plt.imshow(im)
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
         if i == n // 2:
             ax.set_title('Original images')
         ax = plt.subplot(2, n, i + 1 + n)
+        #im = img[0].T
+        print(rec_img.shape)
         plt.imshow(rec_img.cpu().squeeze().numpy(), cmap='gist_gray')
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
@@ -223,7 +231,7 @@ def plot_ae_outputs(encoder, decoder, n=10):
     plt.show()
 
 
-num_epochs = 30
+num_epochs = 2
 diz_loss = {'train_loss': [], 'val_loss': []}
 for epoch in range(num_epochs):
     train_loss = train_epoch(encoder, decoder, device,
@@ -232,4 +240,7 @@ for epoch in range(num_epochs):
     print('\n EPOCH {}/{} \t train loss {} \t val loss {}'.format(epoch + 1, num_epochs, train_loss, val_loss))
     diz_loss['train_loss'].append(train_loss)
     diz_loss['val_loss'].append(val_loss)
-    plot_ae_outputs(encoder, decoder, n=10)
+
+    #print(diz_loss)
+
+plot_ae_outputs(encoder, decoder, n=10)
