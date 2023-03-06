@@ -21,6 +21,7 @@ for direct in os.listdir("dataset/"):
             if file != ".DS_Store":
                 img = Image.open(f"dataset/{direct}/{file}")
                 img = img.resize((t,t))
+                p
                 arr = np.array(img)/255
             X.append(arr)
 X = np.array(X)
