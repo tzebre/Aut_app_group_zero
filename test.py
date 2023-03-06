@@ -111,12 +111,15 @@ class Pastchoice(ctk.CTkScrollableFrame):
 
 
 class Application(ctk.CTk):
-    photo_frame = {0: {}, 1: {}}
+    photo_frame = {}
     size_photo = None
+    col = 4
+    row = 2
 
     def __init__(self):
         super().__init__()
         self.delay = None
+        self.init_photo_frame()
         self.toplevel = None
         self.end_btn = None
         self.h_past = None
@@ -131,6 +134,14 @@ class Application(ctk.CTk):
         self.info()
         #self.accueil()
         self.make_frame()
+
+    def init_photo_frame(self):
+        for r in range(Application.row):
+            Application.photo_frame[r] = {}
+            for c in range(Application.col):
+                Application.photo_frame[r][c] = None
+
+        print(Application.photo_frame)
 
     def info(self):
         """
@@ -199,10 +210,7 @@ class Application(ctk.CTk):
         btm.columnconfigure(1, weight=2, uniform="group1")
         btm.columnconfigure(2, weight=1, uniform="group2")
         btm.columnconfigure(3, weight=1, uniform="group2")
-        if fun:
-            self.end_btn = ctk.CTkButton(btm, text="Validation finale", command=self.end_gif)
-        else:
-            self.end_btn = ctk.CTkButton(btm, text="Validation finale", command=self.end)
+        self.end_btn = ctk.CTkButton(btm, text="Validation finale", command=self.end)
         self.end_btn.grid(row=0, column=3)
         self.entropy_slider = ctk.CTkSlider(master=btm, from_=0, to=100, command=self.change_value)
         self.entropy_slider.grid(row=0, column=0, sticky="nsew")
@@ -211,16 +219,18 @@ class Application(ctk.CTk):
         next_btn = ctk.CTkButton(btm, text="Next", command=self.next)
         next_btn.grid(row=0, column=2)
 
-        for r in range(2):
+        for r in range(Application.row):
             top.grid_rowconfigure(r, weight=1)
             if r == 0:
                 pady = (10, 5)
-            else:
+            elif r == Application.row :
                 pady = (5, 10)
-            for c in range(3):
-                if c == 1:
+            else :
+                pady = (5, 5)
+            for c in range(Application.col):
+                if c != 0 :
                     padx = (5, 5)
-                elif c == 2:
+                elif c == Application.col:
                     padx = (5, 10)
                 else:
                     padx = (10, 5)
@@ -231,8 +241,8 @@ class Application(ctk.CTk):
                     'clicked': False, 'order': None, 'source': ""}
                 Application.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
                 w, h = get_frame_size(right)
-                w = w // 3.5
-                h = h // 2.5
+                w = w // Application.col +1
+                h = h // Application.row + 1
                 Application.size_photo = (w, h)
         self.new_image()
 
@@ -264,7 +274,6 @@ class Application(ctk.CTk):
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
             self.selected_source = focus_btn["source"]
-            self.end_btn.configure(state="normal")
 
     def next(self):
         self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
@@ -281,16 +290,13 @@ class Application(ctk.CTk):
             cliqué.
 
         """
-        try:
-            self.end_btn.configure(state="disabled")
-        except AttributeError:
-            #messagebox.showinfo("Error Message", "end_btn does not exist yet")
-            pass
-
-        for r in range(2):
-            for c in range(3):
+        for r in range(Application.row):
+            for c in range(Application.col):
                 self.photo_frame[r][c]['btn'].configure(fg_color="grey")
                 self.photo_frame[r][c]['clicked'] = False
+
+    def valid_choice(self):
+        pass
 
     @classmethod
     def new_image(cls, past=0):
@@ -304,8 +310,8 @@ class Application(ctk.CTk):
                 Aucun.
         """
         cls.unselect_all(cls)
-        for r in range(2):
-            for c in range(3):
+        for r in range(Application.row):
+            for c in range(Application.col):
                 source = random_img()
                 Application.photo_frame[r][c]['source'] = source
                 Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
@@ -351,16 +357,22 @@ class Application(ctk.CTk):
         self.frames = None
         self.gif_frame.destroy()
         self.toplevel.destroy()
+        global fun
+        fun = False
         self.end()
 
     def end(self):
-        self.toplevel = tk.Toplevel(self)
-        self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
-        self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
-        export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
-                                     compound="bottom",
-                                     text="export image", fg_color="darkgrey", hover_color="grey")
-        export_image.grid(row=0, column=0)
+        if fun :
+            self.end_gif()
+        else:
+            # ajouter verif de si ca vous va
+            self.toplevel = tk.Toplevel(self)
+            self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
+            self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
+            export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
+                                         compound="bottom",
+                                         text="export image", fg_color="darkgrey", hover_color="grey")
+            export_image.grid(row=0, column=0)
 
 
 for dir_path in [last_path]:
@@ -372,7 +384,7 @@ for dir_path in [last_path]:
 
 app = Application()
 # Load the image file from disk.
-icon = tk.PhotoImage(file="./file/logo.png")
+icon = tk.PhotoImage(file=".source/logo.png")
 # Set it as the window icon.
 app.iconphoto(True, icon)
 app.mainloop()
