@@ -28,7 +28,6 @@ X = np.array(X)
 print(f"X shape {X.shape}")
 X_train, X_test = train_test_split(X,test_size=0.2, random_state=0)
 
-"""
 # Encoder
 input_img = Input(shape=(t, t, 3))
 x = Conv2D(32, (3, 3), activation='relu', padding='same')(input_img)
@@ -49,46 +48,7 @@ decoded = Conv2D(3, (3, 3), activation='sigmoid', padding='same')(x)
 
 autoencoder = Model(input_img, decoded)
 autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
-"""
-H = 64
-W = 64
-C = 3
 
-## Latent space
-latent_dim = 128
-
-## Building the autoencoder
-inputs = Input(shape=(H, W, C), name="inputs")
-x = inputs
-
-x = Conv2D(32, (3, 3), padding="same")(x)
-x = BatchNormalization()(x)
-x = LeakyReLU(alpha=0.2)(x)
-x = MaxPool2D((2, 2))(x)
-
-x = Conv2D(64, (3, 3), padding="same")(x)
-x = BatchNormalization()(x)
-x = LeakyReLU(alpha=0.2)(x)
-x = MaxPool2D((2, 2))(x)
-x = Flatten()(x)
-units = x.shape[1]
-x = Dense(latent_dim, name="latent")(x)
-x = Dense(units)(x)
-x = LeakyReLU(alpha=0.2)(x)
-x = Reshape((16, 16, 64))(x)
-
-x = Conv2DTranspose(64, (3, 3), strides=2, padding="same")(x)
-x = BatchNormalization()(x)
-x = LeakyReLU(alpha=0.2)(x)
-
-x = Conv2DTranspose(3, (3, 3), strides=2, padding="same")(x)
-x = BatchNormalization()(x)
-x = Activation("sigmoid", name="outputs")(x)
-
-outputs = x
-
-autoencoder = Model(inputs, outputs)
-autoencoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
 
 print(autoencoder.summary())
 
