@@ -106,15 +106,27 @@ class Pastchoice(ctk.CTkScrollableFrame):
                 None
         """
         self.count += 1
+        new_path = source_img.split("/")[2]
+        new_dir = f"{last_path}{self.count}"
+        os.mkdir(new_dir)
+        new_path = new_dir + "/" + new_path
+        Image.open(source_img).save(new_path)
+        self.change_temp([new_path])
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
-                            command=lambda cnt=self.count, source=source_img: self.go_past(cnt, source),
+                            command=lambda cnt=self.count, source=source_img: self.go_past(cnt, new_path),
                             image=convert_photoimg(source_img, size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
-        new_path = source_img.split("/")[2]
-        Image.open(source_img).save(last_path + new_path)
+        self.all_past[self.count] = [old, new_dir]
 
-        self.all_past[self.count] = [old, last_path + new_path]
+
+    def change_temp(self, files):
+        for d in os.listdir(past_temp):
+            os.remove(f"{past_temp}{d}")
+        for f in files:
+            shutil.copyfile(f, f"{past_temp}/{f.split('/')[-1]}")
+
+
 
     def go_past(self, cnt, source):
         """
@@ -132,8 +144,14 @@ class Pastchoice(ctk.CTkScrollableFrame):
             self.all_past[i][0].destroy()
             path = self.all_past[i][1]
             if os.path.exists(path):
-                os.remove(path)
+                shutil.rmtree(path)
             self.all_past.pop(i)
+        files = []
+        for f in os.listdir(f"{last_path}{self.count}"):
+            files.append(f"{last_path}{self.count}/{f}")
+        self.change_temp(files)
+        self.selected_source = f"{files[0]}"
+        print("go_past",self.selected_source)
 
         Application.new_image(1)
 
@@ -169,7 +187,6 @@ class Application(ctk.CTk):
             for c in range(Application.col):
                 Application.photo_frame[r][c] = None
 
-        print(Application.photo_frame)
 
     def info(self):
         """
@@ -298,11 +315,19 @@ class Application(ctk.CTk):
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
             self.selected_source = focus_btn["source"]
+            print("button_click", self.selected_source)
 
     def next(self):
         self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
         self.unselect_all()
-        self.selected_source = None
+        f = os.listdir(f"{past_temp}")
+        if len(f) > 1:
+            self.end_btn.configure(state="disabled")
+            self.selected_source = None
+        else:
+            self.end_btn.configure(state="normal")
+            self.selected_source = f"{past_temp}{f[0]}"
+            print("next", self.selected_source)
         Application.new_image()
 
     def unselect_all(self):
@@ -394,6 +419,7 @@ class Application(ctk.CTk):
             self.toplevel = tk.Toplevel(self)
             self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
             self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
+            print("end", self.selected_source)
             export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
                                          compound="bottom",
                                          text="export image", fg_color="darkgrey", hover_color="grey")
