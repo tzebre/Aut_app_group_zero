@@ -8,7 +8,7 @@ import shutil
 import random
 import os
 from PIL import Image
-import AE_GEN as ae
+#import AE_GEN as ae
 import matplotlib.pyplot as plt
 import numpy as np
 # import the time module
@@ -19,13 +19,16 @@ import time
 
  
 img_path = "dataset/00000/"
-last_path = "past/"
-muted_path = "img/"
+last_path = ".past/"
+muted_path = ".img/"
+past_temp = ".past_temp/"
 fun = True
 
 H = 64
 W = 64
 C = 3
+
+"""
 def muted_img(choice_path):
     arr = ae.convert_img(choice_path)
     muted = ae.mutate_arr(arr, 0.3)
@@ -36,7 +39,7 @@ def muted_img(choice_path):
     path = f"{muted_path}/muted_{time.time()}.png"
     img.save(path)
     return path
-
+"""
 def random_img():
     """
         Retourne une image aléatoire parmi une liste d'images.
@@ -85,6 +88,7 @@ def convert_photoimg(source, size):
 
 
 class Pastchoice(ctk.CTkScrollableFrame):
+    #TODO past_temp et past a faire avec les bon path par geenration et afficher image multiple sur scroll
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.count = 0
@@ -108,7 +112,6 @@ class Pastchoice(ctk.CTkScrollableFrame):
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
         new_path = source_img.split("/")[2]
-        print(new_path)
         Image.open(source_img).save(last_path + new_path)
 
         self.all_past[self.count] = [old, last_path + new_path]
@@ -397,7 +400,7 @@ class Application(ctk.CTk):
             export_image.grid(row=0, column=0)
 
 
-for dir_path in [last_path, muted_path]:
+for dir_path in [last_path, muted_path, past_temp]:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     else:
