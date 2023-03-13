@@ -6,12 +6,36 @@ from itertools import count, cycle
 import os
 import shutil
 import random
-from tkinter import messagebox
+import os
+from PIL import Image
+import AE_GEN as ae
+import matplotlib.pyplot as plt
+import numpy as np
+# import the time module
+import time
+#TODO choix plusieur images
+#TODO Generation et save image
+
+
  
-img_path = "img/"
+img_path = "dataset/00000/"
 last_path = "past/"
+muted_path = "img/"
 fun = True
 
+H = 64
+W = 64
+C = 3
+def muted_img(choice_path):
+    arr = ae.convert_img(choice_path)
+    muted = ae.mutate_arr(arr, 0.3)
+    res = ae.decoder.predict(muted)
+    img = res.reshape(H, W, C)
+    img = img * 255
+    img = Image.fromarray(img.astype('uint8'))
+    path = f"{muted_path}/muted_{time.time()}.png"
+    img.save(path)
+    return path
 
 def random_img():
     """
@@ -20,7 +44,7 @@ def random_img():
         Returns:
             str: Chemin d'accès vers l'image aléatoire sélectionnée.
         """
-    images = glob.glob(random.choice([img_path + "*.jpg"]))
+    images = glob.glob(random.choice([img_path + "*.png"]))
     random_image = random.choice(images)
     return random_image
 
@@ -83,7 +107,8 @@ class Pastchoice(ctk.CTkScrollableFrame):
                             image=convert_photoimg(source_img, size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
-        new_path = source_img.split("/")[1]
+        new_path = source_img.split("/")[2]
+        print(new_path)
         Image.open(source_img).save(last_path + new_path)
 
         self.all_past[self.count] = [old, last_path + new_path]
@@ -113,7 +138,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
 class Application(ctk.CTk):
     photo_frame = {}
     size_photo = None
-    col = 4
+    col = 3
     row = 2
 
     def __init__(self):
@@ -212,10 +237,6 @@ class Application(ctk.CTk):
         btm.columnconfigure(3, weight=1, uniform="group2")
         self.end_btn = ctk.CTkButton(btm, text="Validation finale", command=self.end)
         self.end_btn.grid(row=0, column=3)
-        self.entropy_slider = ctk.CTkSlider(master=btm, from_=0, to=100, command=self.change_value)
-        self.entropy_slider.grid(row=0, column=0, sticky="nsew")
-        self.entropy_value = ctk.CTkLabel(master=btm, text=f"entropy : {self.entropy_slider.get():.02f}")
-        self.entropy_value.grid(row=0, column=1, sticky="nsew")
         next_btn = ctk.CTkButton(btm, text="Next", command=self.next)
         next_btn.grid(row=0, column=2)
 
@@ -315,7 +336,8 @@ class Application(ctk.CTk):
                 source = random_img()
                 Application.photo_frame[r][c]['source'] = source
                 Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-                                                               compound='top')
+                                                              compound='top')
+
     def end_gif(self):
         self.toplevel = tk.Toplevel(self)
         self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
@@ -375,7 +397,7 @@ class Application(ctk.CTk):
             export_image.grid(row=0, column=0)
 
 
-for dir_path in [last_path]:
+for dir_path in [last_path, muted_path]:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     else:
