@@ -1,23 +1,19 @@
 import tkinter as tk
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import ImageTk
 import glob
 from itertools import count, cycle
-import os
 import shutil
 import random
 import os
 from PIL import Image
 import AE_GEN as ae
-import matplotlib.pyplot as plt
 import numpy as np
-# import the time module
-import time
-#TODO choix plusieur images
-#TODO Generation et save image
+
+# TODO choix plusieur images
+# TODO Generation et save image
 
 
- 
 img_path = "dataset/00000/"
 last_path = ".past/"
 muted_path = ".img/"
@@ -27,6 +23,21 @@ fun = True
 H = 64
 W = 64
 C = 3
+
+
+def init_photo_frame():
+    for r in range(Application.row):
+        Application.photo_frame[r] = {}
+        for c in range(Application.col):
+            Application.photo_frame[r][c] = None
+
+
+def change_temp(files):
+    for d in os.listdir(past_temp):
+        os.remove(f"{past_temp}{d}")
+    for f in files:
+        shutil.copyfile(f, f"{past_temp}/{f.split('/')[-1]}")
+
 
 def random_img():
     """
@@ -39,15 +50,17 @@ def random_img():
     random_image = random.choice(images)
     return random_image
 
+
 def created_img():
     files = os.listdir(muted_path)
-    for i,f in enumerate(files):
+    for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
     files.append(files[-1])
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
     print(img_lst)
     return img_lst
+
 
 def get_frame_size(frame):
     """
@@ -85,7 +98,7 @@ def convert_photoimg(source, size):
 
 
 class Pastchoice(ctk.CTkScrollableFrame):
-    #TODO past_temp et past a faire avec les bon path par geenration et afficher image multiple sur scroll
+    # TODO past_temp et past a faire avec les bon path par geenration et afficher image multiple sur scroll
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.count = 0
@@ -108,7 +121,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
         os.mkdir(new_dir)
         new_path = new_dir + "/" + new_path
         Image.open(source_img).save(new_path)
-        self.change_temp([new_path])
+        change_temp([new_path])
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
                             command=lambda cnt=self.count, source=source_img: self.go_past(cnt, new_path),
                             image=convert_photoimg(source_img, size), text=self.count,
@@ -116,22 +129,12 @@ class Pastchoice(ctk.CTkScrollableFrame):
         old.pack(side="bottom", pady=(5, 5))
         self.all_past[self.count] = [old, new_dir]
 
-
-    def change_temp(self, files):
-        for d in os.listdir(past_temp):
-            os.remove(f"{past_temp}{d}")
-        for f in files:
-            shutil.copyfile(f, f"{past_temp}/{f.split('/')[-1]}")
-
-
-
-    def go_past(self, cnt, source):
+    def go_past(self, cnt):
         """
             Efface tous les boutons d'images qui se trouvent après le bouton sélectionné.
 
             Args:
                 cnt (int): Numéro du bouton sélectionné.
-                source (str): Chemin d'accès vers l'image source associée au bouton sélectionné.
 
             Returns:
                 None
@@ -146,7 +149,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
         files = []
         for f in os.listdir(f"{last_path}{self.count}"):
             files.append(f"{last_path}{self.count}/{f}")
-        self.change_temp(files)
+        change_temp(files)
         Application.selected_source = f"{files[0]}"
 
         Application.new_image(1)
@@ -163,7 +166,7 @@ class Application(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.delay = None
-        self.init_photo_frame()
+        init_photo_frame()
         self.toplevel = None
         self.end_btn = None
         self.h_past = None
@@ -175,15 +178,8 @@ class Application(ctk.CTk):
         self.frames = None
         self.title("zero")
         self.info()
-        #self.accueil()
+        # self.accueil()
         self.make_frame()
-
-    def init_photo_frame(self):
-        for r in range(Application.row):
-            Application.photo_frame[r] = {}
-            for c in range(Application.col):
-                Application.photo_frame[r][c] = None
-
 
     def info(self):
         """
@@ -200,6 +196,7 @@ class Application(ctk.CTk):
         x = 0
         y = 0
         self.geometry("{}x{}+{}+{}".format(w, h, int(x), int(y)))
+
     # def accueil(self):
     #     btm = tk.Frame()
     #     im = Image.open('./file/logo.png')
@@ -261,12 +258,12 @@ class Application(ctk.CTk):
             top.grid_rowconfigure(r, weight=1)
             if r == 0:
                 pady = (10, 5)
-            elif r == Application.row :
+            elif r == Application.row:
                 pady = (5, 10)
-            else :
+            else:
                 pady = (5, 5)
             for c in range(Application.col):
-                if c != 0 :
+                if c != 0:
                     padx = (5, 5)
                 elif c == Application.col:
                     padx = (5, 10)
@@ -279,7 +276,7 @@ class Application(ctk.CTk):
                     'clicked': False, 'order': None, 'source': ""}
                 Application.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
                 w, h = get_frame_size(right)
-                w = w // Application.col +1
+                w = w // Application.col + 1
                 h = h // Application.row + 1
                 Application.size_photo = (w, h)
         self.new_image()
@@ -343,7 +340,7 @@ class Application(ctk.CTk):
         pass
 
     @classmethod
-    def new_image(cls, past=0):
+    def new_image(cls):
         """
         Génère de nouvelles images pour chaque bouton de la grille photo.
 
@@ -365,15 +362,17 @@ class Application(ctk.CTk):
                 for c in range(Application.col):
                     source = random_img()
                     Application.photo_frame[r][c]['source'] = source
-                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-                                                                  compound='top')
+                    Application.photo_frame[r][c]['btn'].configure(
+                        image=convert_photoimg(source, Application.size_photo),
+                        compound='top')
         else:
             source = created_img()
             for r in range(Application.row):
                 for c in range(Application.col):
-                    Application.photo_frame[r][c]['source'] = source[r-1][c-1]
-                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source[r-1][c-1], Application.size_photo),
-                                                                  compound='top')
+                    Application.photo_frame[r][c]['source'] = source[r - 1][c - 1]
+                    Application.photo_frame[r][c]['btn'].configure(
+                        image=convert_photoimg(source[r - 1][c - 1], Application.size_photo),
+                        compound='top')
 
     def end_gif(self):
         self.toplevel = tk.Toplevel(self)
@@ -421,14 +420,15 @@ class Application(ctk.CTk):
         self.end()
 
     def end(self):
-        if fun :
+        if fun:
             self.end_gif()
         else:
             # ajouter verif de si ca vous va
             self.toplevel = tk.Toplevel(self)
             self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
             self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
-            export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(Application.selected_source)),
+            export_image = ctk.CTkButton(self.toplevel,
+                                         image=ImageTk.PhotoImage(Image.open(Application.selected_source)),
                                          compound="bottom",
                                          text="export image", fg_color="darkgrey", hover_color="grey")
             export_image.grid(row=0, column=0)
@@ -440,7 +440,6 @@ for dir_path in [last_path, muted_path, past_temp, muted_path]:
     else:
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
-
 
 app = Application()
 # Load the image file from disk.

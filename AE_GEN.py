@@ -1,7 +1,6 @@
 import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-from sklearn.model_selection import train_test_split
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,8 +8,6 @@ import tensorflow as tf
 
 from tensorflow.keras.optimizers import Adam, SGD
 
-print("")
-from tqdm import trange, tqdm
 import time
 import shutil
 
