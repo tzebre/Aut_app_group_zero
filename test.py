@@ -156,6 +156,7 @@ class Application(ctk.CTk):
     photo_frame = {}
     size_photo = None
     selected_source = None
+    never = True
     col = 3
     row = 2
 
@@ -353,8 +354,13 @@ class Application(ctk.CTk):
                 Aucun.
         """
         cls.unselect_all(cls)
-        ae.main_genetic_algorithm()
-        if len(os.listdir(img_path)) == 0:
+        if Application.never:
+            for i in range(1, 6):
+                shutil.copyfile(f"dataset/00000/0000{i}.png", f"{muted_path}0000{i}.png")
+        else:
+            ae.main_genetic_algorithm()
+        Application.never = False
+        if Application.never:
             for r in range(Application.row):
                 for c in range(Application.col):
                     source = random_img()
@@ -435,8 +441,6 @@ for dir_path in [last_path, muted_path, past_temp, muted_path]:
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
 
-for i in range(1,7):
-    shutil.copyfile(f"dataset/00000/0000{i}.png",f"{muted_path}0000{i}.png")
 
 app = Application()
 # Load the image file from disk.

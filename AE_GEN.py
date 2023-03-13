@@ -6,9 +6,7 @@ from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Conv2D, Activation, MaxPool2D
-from tensorflow.keras.layers import BatchNormalization, Flatten, Reshape, Conv2DTranspose, LeakyReLU
-from tensorflow.keras.models import Model
+
 from tensorflow.keras.optimizers import Adam, SGD
 
 print("")
