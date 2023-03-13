@@ -12,8 +12,9 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam, SGD
 
 print("")
-t = 64
 from tqdm import trange, tqdm
+import time
+import shutil
 
 ##ajouté pour algo gen
 from statistics import mean
@@ -26,81 +27,108 @@ tf.random.set_seed(42)
 H = 64
 W = 64
 C = 3
-
-## réutiliser les modèles sauvegardés
 encoder = tf.keras.models.load_model('saved_model/encoder.tf', compile=False)
+# encoder.summary()
 decoder = tf.keras.models.load_model('saved_model/decoder.tf', compile=False)
+# decoder.summary()
 
 encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
 decoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
 
 
-## ouvrir les images d'un dossier
-
-def open_dir():
+# plot(data,decoded_imgs)
+def implement_img():
+    """
+    Returns:
+      a tab of the encoded selected images
+    """
     X = []
-    for file in os.listdir("dataset/06000"):
-        img = Image.open(f"dataset/06000/{file}")
-        img = img.resize((t, t))
-        arr = np.array(img) / 255
-        X.append(arr)
+    # for file in os.listdir(f"dataset/06000"):
+    if len(os.listdir(f".past_temp/")) != 0:
+        for file in os.listdir(f".past_temp/"):
+            if file != ".DS_Store":
+                # img = Image.open(f"dataset/06000/{file}")
+                img = Image.open(f".past_temp/{file}")
+                t = 64
+                img = img.resize((t, t))
+                arr = np.array(img) / 255
+                X.append(arr)
+    else:
+        for file in os.listdir(f"dataset/06000/"):
+            if file != ".DS_Store":
+                img = Image.open(f"dataset/06000/{file}")
+                t = 64
+                img = img.resize((t, t))
+                arr = np.array(img) / 255
+                X.append(arr)
     X = np.array(X)
-    return (X)
+    X = encoder.predict(X)
+
+    return X
 
 
-def convert_img(img_path):
-    img = Image.open(img_path)
-    img = img.resize((t, t))
-    arr = np.array(img) / 255
-    return (np.array([arr]))
+X = implement_img()[0:6]
+print(len(X))
 
-def plot_img(data,decoded):
-  n = len(data) ## how many digits we will display
-  plt.figure(figsize=(20, 4))
-  for i in range(n):
-      ## display original
-      ax = plt.subplot(2, n, i + 1)
-      ax.set_title("Original Image")
-      plt.imshow(data[i].reshape(H, W, C))
-      plt.gray()
-      ax.get_xaxis().set_visible(False)
-      ax.get_yaxis().set_visible(False)
 
-      ## display reconstruction
-      ax = plt.subplot(2, n, i + 1 + n)
-      ax.set_title("Predicted Image")
-      plt.imshow(decoded[i].reshape(H, W, C))
-      plt.gray()
-      ax.get_xaxis().set_visible(False)
-      ax.get_yaxis().set_visible(False)
-  plt.show()
+# print(X[0:6])
 
-def mutate_arr(array, r):
-    encoded = encoder.predict(array)
-    print(encoded.shape)
-    v = np.copy(encoded)
+def generate_initial_pop(list_img, N):
+    """
+    Args:
+      list_img : a list of encoded images
+    Return:
+      initial population of genetic algorithm
+    """
+    res = []
+    #  N=len(list_img)
+    # print(N)
+    val = (1, 1, 1)
+    if N == 1:
+        for i in (0, 0, 0, 0, 0):
+            res.append(list_img[0])
+            val = (0.3, 1, 0.6)
+    elif N == 2:
+        for i in (0, 0, 0, 1, 1):
+            res.append(list_img[i])
+            val = (0.3, 0.9, 0.6)
+    elif N == 3:
+        for i in (0, 0, 1, 1, 2):
+            res.append(list_img[i])
+            val = (0.3, 0.8, 0.7)
+    elif N == 4:
+        for i in (0, 0, 1, 2, 3):
+            res.append(list_img[i])
+            val = (0.3, 0.6, 0.7)
+    elif N == 5:
+        for i in (0, 1, 2, 3, 4):
+            res.append(list_img[i])
+            val = (0.2, 0.6, 0.8)
+
+    # print(len(res))
+    return (np.array(res), val)
+
+
+def mutation(data_encoded, r, ratio=1):
+    v = np.copy(data_encoded)
     for i in range(len(v)):  ##pour chaque image
         moyenne = mean(v[i])
         sigma = np.std(v[i])
+        # print("vecteur")
+        # print(v[i])
+        print(moyenne)
+        print(sigma)
         ## à faire varier : le nombre devant sigma + la proba avec laquelle il y a des mutations
         for j in range(len(v[i])):
             p = np.random.random()
             if p < r:
                 # print('mutation')
-                v[i, j] = 1 * sigma * np.random.random() + moyenne
+                a = np.random.random()
+                if a < 0.5:
+                    v[i, j] = ratio * 1 * sigma * np.random.random() + moyenne
+                else:
+                    v[i, j] = ratio * -1 * sigma * np.random.random() + moyenne
     return v
-def mutation(data_encoded,r): # proba mutation
-  v = np.copy(data_encoded)
-  for i in range(len(v)): ##pour chaque image
-    moyenne=mean(v[i])
-    sigma=np.std(v[i])
-    ## à faire varier : le nombre devant sigma + la proba avec laquelle il y a des mutations
-    for j in range(len(v[i])):
-      p = np.random.random()
-      if p < r:
-        #print('mutation')
-        v[i,j] = 1*sigma*np.random.random()+moyenne
-  return v
 
 
 def crossing_over(P, Tc):
@@ -127,36 +155,72 @@ def crossing_over(P, Tc):
     return new_P
 
 
+def plot_img(data, decoded):
+    n = len(data)  ## how many digits we will display
+    plt.figure(figsize=(20, 4))
+    for i in range(n):
+        ## display original
+        ax = plt.subplot(2, n, i + 1)
+        ax.set_title("Original Image")
+        plt.imshow(data[i].reshape(H, W, C))
+        plt.gray()
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+
+        ## display reconstruction
+        ax = plt.subplot(2, n, i + 1 + n)
+        ax.set_title("Predicted Image")
+        plt.imshow(decoded[i].reshape(H, W, C))
+        plt.gray()
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+    plt.show()
 
 
-if __name__ == "__main__":
-    X = open_dir()
-    data = X[0:6]
-    print(data.shape)
-    encoded_imgs = encoder.predict(data)
-    decoded_imgs = decoder.predict(encoded_imgs)
-    plot_img(data, decoded_imgs)
-    v = encoder.predict(data)
-    mutated = mutation(v, 0.3)
-    dec_mut = decoder.predict(mutated)
-    plot_img(decoded_imgs, dec_mut)
-    v = encoder.predict(data)
-    newv = crossing_over(v, 0.5)
-    # print(v[0]==newv[0]) ##ok
-    dec_cross = decoder.predict(newv)
-    # print(decoded_imgs[0]==dec_cross[0])
-    plot_img(decoded_imgs, dec_cross)
-    newv2 = crossing_over(v, 0.2)
-    dec_cross2 = decoder.predict(newv2)
-    plot_img(decoded_imgs, dec_cross2)
-    cm = crossing_over(v, 0.2)
-    cm = mutation(cm, 0.3)
-    dec_cm = decoder.predict(cm)
-    plot_img(decoded_imgs, dec_cm)
-    mc = mutation(v, 0.3)
-    mc = crossing_over(mc, 0.2)
-    mc2 = mutation(mc, 0.2)
-    mc2 = crossing_over(mc2, 0.3)
-    dec_mc = decoder.predict(mc2)
-    plot_img(decoded_imgs, dec_mc)
+# Afficher chaque image et les enregistrer en PNG
+def save_modified_img(pop):
+    # rajouter les points après
+    if not os.path.exists('.img'):
+        os.makedirs('.img')
+    else:
+        shutil.rmtree('.img')
+        os.makedirs('.img')
 
+    for i in range(pop.shape[0]):
+        plt.imshow(pop[i])
+        plt.axis('off')
+
+        # Redimensionner l'image en 64x64 pixels
+        img = Image.fromarray(np.uint8(pop[i] * 255))
+        # img = img.resize((64, 64))
+
+        # Enregistrer l'image en tant que fichier PNG
+        path = f".img/muted_{time.time()}.png"
+        img.save(path, format='PNG', dpi=(300, 300))
+
+        plt.clf()  # Effacer la figure pour la prochaine image
+
+
+def main_genetic_algorithm():
+    images = implement_img()[0:4]
+    N = len(images)
+    if N == 64:
+        images = [images]
+        N = len(images)
+    pop, val = generate_initial_pop(images, N)
+    # plot_img(decoder.predict(pop),decoder.predict(pop))
+    # print(len(pop))
+    # pop=generate_initial_pop(images)
+    r_mut = val[0]
+    ratio = val[1]
+    r_cross = val[2]
+    pop = mutation(pop, r_mut, ratio)  # d'abord faire mutations sinon crossing over sert à rien
+    pop = crossing_over(pop, r_cross)
+    # print(len(pop))
+
+    pop = decoder.predict(pop)
+    #plot_img(pop, pop)
+
+    save_modified_img(pop)
+
+#main_genetic_algorithm()

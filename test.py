@@ -8,7 +8,7 @@ import shutil
 import random
 import os
 from PIL import Image
-#import AE_GEN as ae
+import AE_GEN as ae
 import matplotlib.pyplot as plt
 import numpy as np
 # import the time module
@@ -28,18 +28,6 @@ H = 64
 W = 64
 C = 3
 
-"""
-def muted_img(choice_path):
-    arr = ae.convert_img(choice_path)
-    muted = ae.mutate_arr(arr, 0.3)
-    res = ae.decoder.predict(muted)
-    img = res.reshape(H, W, C)
-    img = img * 255
-    img = Image.fromarray(img.astype('uint8'))
-    path = f"{muted_path}/muted_{time.time()}.png"
-    img.save(path)
-    return path
-"""
 def random_img():
     """
         Retourne une image aléatoire parmi une liste d'images.
@@ -51,6 +39,15 @@ def random_img():
     random_image = random.choice(images)
     return random_image
 
+def created_img():
+    files = os.listdir(muted_path)
+    for i,f in enumerate(files):
+        files[i] = f"{muted_path}{f}"
+    files.append(files[-1])
+    arr_img = np.array(files)
+    img_lst = arr_img.reshape(2, 3)
+    print(img_lst)
+    return img_lst
 
 def get_frame_size(frame):
     """
@@ -106,7 +103,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
                 None
         """
         self.count += 1
-        new_path = source_img.split("/")[2]
+        new_path = source_img.split("/")[1]
         new_dir = f"{last_path}{self.count}"
         os.mkdir(new_dir)
         new_path = new_dir + "/" + new_path
@@ -150,8 +147,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
         for f in os.listdir(f"{last_path}{self.count}"):
             files.append(f"{last_path}{self.count}/{f}")
         self.change_temp(files)
-        self.selected_source = f"{files[0]}"
-        print("go_past",self.selected_source)
+        Application.selected_source = f"{files[0]}"
 
         Application.new_image(1)
 
@@ -159,6 +155,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
 class Application(ctk.CTk):
     photo_frame = {}
     size_photo = None
+    selected_source = None
     col = 3
     row = 2
 
@@ -173,7 +170,6 @@ class Application(ctk.CTk):
         self.scroll_left = None
         self.entropy_slider = None
         self.entropy_value = None
-        self.selected_source = None
         self.gif_frame = None
         self.frames = None
         self.title("zero")
@@ -314,8 +310,7 @@ class Application(ctk.CTk):
             self.unselect_all()
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
-            self.selected_source = focus_btn["source"]
-            print("button_click", self.selected_source)
+            Application.selected_source = focus_btn["source"]
 
     def next(self):
         self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
@@ -323,11 +318,10 @@ class Application(ctk.CTk):
         f = os.listdir(f"{past_temp}")
         if len(f) > 1:
             self.end_btn.configure(state="disabled")
-            self.selected_source = None
+            Application.selected_source = None
         else:
             self.end_btn.configure(state="normal")
-            self.selected_source = f"{past_temp}{f[0]}"
-            print("next", self.selected_source)
+            Application.selected_source = f"{past_temp}{f[0]}"
         Application.new_image()
 
     def unselect_all(self):
@@ -359,12 +353,21 @@ class Application(ctk.CTk):
                 Aucun.
         """
         cls.unselect_all(cls)
-        for r in range(Application.row):
-            for c in range(Application.col):
-                source = random_img()
-                Application.photo_frame[r][c]['source'] = source
-                Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
-                                                              compound='top')
+        ae.main_genetic_algorithm()
+        if len(os.listdir(img_path)) == 0:
+            for r in range(Application.row):
+                for c in range(Application.col):
+                    source = random_img()
+                    Application.photo_frame[r][c]['source'] = source
+                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source, Application.size_photo),
+                                                                  compound='top')
+        else:
+            source = created_img()
+            for r in range(Application.row):
+                for c in range(Application.col):
+                    Application.photo_frame[r][c]['source'] = source[r-1][c-1]
+                    Application.photo_frame[r][c]['btn'].configure(image=convert_photoimg(source[r-1][c-1], Application.size_photo),
+                                                                  compound='top')
 
     def end_gif(self):
         self.toplevel = tk.Toplevel(self)
@@ -419,19 +422,21 @@ class Application(ctk.CTk):
             self.toplevel = tk.Toplevel(self)
             self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
             self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
-            print("end", self.selected_source)
-            export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(self.selected_source)),
+            export_image = ctk.CTkButton(self.toplevel, image=ImageTk.PhotoImage(Image.open(Application.selected_source)),
                                          compound="bottom",
                                          text="export image", fg_color="darkgrey", hover_color="grey")
             export_image.grid(row=0, column=0)
 
 
-for dir_path in [last_path, muted_path, past_temp]:
+for dir_path in [last_path, muted_path, past_temp, muted_path]:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     else:
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
+
+for i in range(1,7):
+    shutil.copyfile(f"dataset/00000/0000{i}.png",f"{muted_path}0000{i}.png")
 
 app = Application()
 # Load the image file from disk.
