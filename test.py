@@ -123,7 +123,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
         Image.open(source_img).save(new_path)
         change_temp([new_path])
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
-                            command=lambda cnt=self.count, source=source_img: self.go_past(cnt, new_path),
+                            command=lambda cnt=self.count, source=source_img: self.go_past(cnt),
                             image=convert_photoimg(source_img, size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
@@ -152,7 +152,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
         change_temp(files)
         Application.selected_source = f"{files[0]}"
 
-        Application.new_image(1)
+        Application.new_image()
 
 
 class Application(ctk.CTk):
