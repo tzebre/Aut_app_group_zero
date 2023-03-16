@@ -18,12 +18,41 @@ img_path = "dataset/00000/"
 last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
+dir_cache  = ".cache/"
 fun = True
 
 H = 64
 W = 64
 C = 3
 
+def make_thumbnail(list_img):
+    print(list_img)
+    col = 2
+    if len(list_img) > 4:
+        row = 3
+    else :
+        row = 2
+    dst = Image.new('RGB', (W*col, H*row))
+    opened = []
+    for i in list_img:
+       opened.append(Image.open(i).resize((H, W)))
+    for i, im in enumerate(opened):
+        print(i)
+        if i <2:
+            dst.paste(im, (i*W, 0))
+        elif i ==2:
+            print("3")
+            dst.paste(im, (0, H))
+        elif i == 3:
+            print("4")
+            dst.paste(im, (W, H))
+        elif i == 4:
+            print("5")
+            dst.paste(im, (0, 2*H))
+        else:
+            dst.paste(im, (W, H*2))
+    dst.save(f"{dir_cache}thumbnailed.png")
+    return f"{dir_cache}thumbnailed.png"
 
 def init_photo_frame():
     for r in range(Application.row):
@@ -58,7 +87,6 @@ def created_img():
     files.append(files[-1])
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
-    print(img_lst)
     return img_lst
 
 
@@ -104,27 +132,28 @@ class Pastchoice(ctk.CTkScrollableFrame):
         self.count = 0
         self.all_past = {}
 
-    def add_img(self, source_img, size):
+    def add_img(self, size):
         """
             Ajoute une image à l'interface graphique sous forme de bouton avec un texte et un compteur.
 
             Args:
-                source_img (str): Chemin d'accès vers l'image à afficher sur le bouton.
                 size (tuple): Largeur et hauteur de l'image redimensionnée.
 
             Returns:
                 None
         """
         self.count += 1
-        new_path = source_img.split("/")[1]
-        new_dir = f"{last_path}{self.count}"
+        new_dir = f"{last_path}{self.count}/"
         os.mkdir(new_dir)
-        new_path = new_dir + "/" + new_path
-        Image.open(source_img).save(new_path)
-        change_temp([new_path])
+        print(Application.selected_source)
+        for source_img in list(Application.selected_source["source"].values()):
+            end_path = source_img.split("/")[1]
+            new_path = new_dir + end_path
+            shutil.copyfile(source_img, new_path)
+            shutil.copyfile(source_img, f"{past_temp}{end_path}")
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
-                            command=lambda cnt=self.count, source=source_img: self.go_past(cnt),
-                            image=convert_photoimg(source_img, size), text=self.count,
+                            command=lambda cnt=self.count, source= Application.selected_source["source"]: self.go_past(cnt),
+                            image=convert_photoimg(Application.selected_source["thumbnail"], size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
         self.all_past[self.count] = [old, new_dir]
@@ -150,15 +179,14 @@ class Pastchoice(ctk.CTkScrollableFrame):
         for f in os.listdir(f"{last_path}{self.count}"):
             files.append(f"{last_path}{self.count}/{f}")
         change_temp(files)
-        Application.selected_source = f"{files[0]}"
-
+        Application.selected_source["source"] = files
         Application.new_image()
 
 
 class Application(ctk.CTk):
     photo_frame = {}
     size_photo = None
-    selected_source = None
+    selected_source = {"thumbnail":str, "source":{}}
     never = True
     col = 3
     row = 2
@@ -281,13 +309,6 @@ class Application(ctk.CTk):
                 Application.size_photo = (w, h)
         self.new_image()
 
-    def change_value(self, val):
-        """Met à jour le texte du label de l'entropie en fonction de la valeur donnée.
-
-            Args:
-                val (float): La nouvelle valeur de l'entropie.
-        """
-        self.entropy_value.configure(text=f"entropy : {val:.02f}")
 
     def button_click(self, coords):
         """Change l'état d'un bouton de photo lorsqu'il est cliqué.
@@ -302,25 +323,24 @@ class Application(ctk.CTk):
         c = coords[1]
         focus_btn = self.photo_frame[r][c]
         if focus_btn["clicked"]:
-            focus_btn['btn'].configure(fg_color="palegreen")
+            focus_btn['btn'].configure(fg_color="grey")
             focus_btn['clicked'] = False
+            Application.selected_source["source"].pop(f"{r}_{c}")
         else:
-            self.unselect_all()
+            #self.unselect_all()
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
-            Application.selected_source = focus_btn["source"]
+            Application.selected_source["source"][f"{r}_{c}"] = focus_btn["source"]
 
     def next(self):
-        self.scroll_left.add_img(self.selected_source, (self.w_past, self.h_past))
         self.unselect_all()
-        f = os.listdir(f"{past_temp}")
-        if len(f) > 1:
-            self.end_btn.configure(state="disabled")
-            Application.selected_source = None
-        else:
-            self.end_btn.configure(state="normal")
-            Application.selected_source = f"{past_temp}{f[0]}"
+        f = list(Application.selected_source["source"].values())
+        self.end_btn.configure(state="normal")
+        Application.selected_source["thumbnail"] = make_thumbnail(f)
+        self.scroll_left.add_img((self.w_past, self.h_past))
+        change_temp(list(Application.selected_source["source"].values()))
         Application.new_image()
+        Application.selected_source["source"] = {}
 
     def unselect_all(self):
         """
@@ -434,7 +454,7 @@ class Application(ctk.CTk):
             export_image.grid(row=0, column=0)
 
 
-for dir_path in [last_path, muted_path, past_temp, muted_path]:
+for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     else:

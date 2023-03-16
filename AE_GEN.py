@@ -63,7 +63,6 @@ def implement_img():
 
 
 X = implement_img()[0:6]
-print(len(X))
 
 
 # print(X[0:6])
@@ -111,8 +110,8 @@ def mutation(data_encoded, r, ratio=1):
         sigma = np.std(v[i])
         # print("vecteur")
         # print(v[i])
-        print(moyenne)
-        print(sigma)
+        #print(moyenne)
+        #print(sigma)
         ## à faire varier : le nombre devant sigma + la proba avec laquelle il y a des mutations
         for j in range(len(v[i])):
             p = np.random.random()
@@ -131,7 +130,7 @@ def crossing_over(P, Tc):
 
     for i in range(0, len(new_P)):  # pour chaque individu
         if random() < Tc:
-            print("crosing over")
+            #print("crosing over")
             indc = randint(0, new_P.shape[0] - 1)  # entier aleat entre 0 et nb d'individus dans la pop
             while indc == i:
                 indc = randint(0, new_P.shape[0] - 1)
