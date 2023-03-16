@@ -27,27 +27,27 @@ C = 3
 
 def make_thumbnail(list_img):
     print(list_img)
-    col = 2
     if len(list_img) > 4:
         row = 3
-    else :
+        col = 2
+    elif len(list_img) >1 :
         row = 2
+        col = 2
+    else :
+        row = 1
+        col = 1
     dst = Image.new('RGB', (W*col, H*row))
     opened = []
     for i in list_img:
        opened.append(Image.open(i).resize((H, W)))
     for i, im in enumerate(opened):
-        print(i)
         if i <2:
             dst.paste(im, (i*W, 0))
         elif i ==2:
-            print("3")
             dst.paste(im, (0, H))
         elif i == 3:
-            print("4")
             dst.paste(im, (W, H))
         elif i == 4:
-            print("5")
             dst.paste(im, (0, 2*H))
         else:
             dst.paste(im, (W, H*2))
