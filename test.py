@@ -10,8 +10,8 @@ from PIL import Image
 import AE_GEN as ae
 import numpy as np
 
-# TODO choix plusieur images
-# TODO Generation et save image
+# TODO mieux gerer la fin a plusieur images
+# TODO export image
 
 
 img_path = "dataset/00000/"
@@ -19,14 +19,13 @@ last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
 dir_cache  = ".cache/"
-fun = True
+fun = False
 
 H = 64
 W = 64
 C = 3
 
 def make_thumbnail(list_img):
-    print(list_img)
     if len(list_img) > 4:
         row = 3
         col = 2
@@ -145,7 +144,6 @@ class Pastchoice(ctk.CTkScrollableFrame):
         self.count += 1
         new_dir = f"{last_path}{self.count}/"
         os.mkdir(new_dir)
-        print(Application.selected_source)
         for source_img in list(Application.selected_source["source"].values()):
             end_path = source_img.split("/")[1]
             new_path = new_dir + end_path
@@ -438,20 +436,42 @@ class Application(ctk.CTk):
         global fun
         fun = False
         self.end()
-
+    def Subselect(self, source):
+        Application.selected_source= {"source":{"selected":source}}
+        self.end()
     def end(self):
-        if fun:
-            self.end_gif()
+        source_list = list(Application.selected_source["source"].values())
+        if len(source_list)==0:
+            print("no selected")
+            temp = os.listdir(past_temp)
+            for t in temp:
+                source_list.append(f"{past_temp}{t}")
+            print(source_list)
+        if len(source_list)>1:
+            print("decalnche top frame")
+            top = tk.Toplevel(self)
+            top.title("SubSelect")
+            for i in source_list:
+                export_image = ctk.CTkButton(top,
+                                             image=ImageTk.PhotoImage(Image.open(i)),
+                                             compound="bottom",  command= lambda x = i: self.Subselect(x),
+                                             text="export image", fg_color="darkgrey", hover_color="grey")
+                export_image.pack()
+
         else:
-            # ajouter verif de si ca vous va
-            self.toplevel = tk.Toplevel(self)
-            self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
-            self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
-            export_image = ctk.CTkButton(self.toplevel,
-                                         image=ImageTk.PhotoImage(Image.open(Application.selected_source)),
-                                         compound="bottom",
-                                         text="export image", fg_color="darkgrey", hover_color="grey")
-            export_image.grid(row=0, column=0)
+            if fun:
+                self.end_gif()
+            else:
+                # ajouter verif de si ca vous va
+
+                self.toplevel = tk.Toplevel(self)
+                self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
+                self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
+                export_image = ctk.CTkButton(self.toplevel,
+                                             image=ImageTk.PhotoImage(Image.open(source_list[0])),
+                                             compound="bottom",
+                                             text="export image", fg_color="darkgrey", hover_color="grey")
+                export_image.grid(row=0, column=0, sticky="nsew")
 
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
