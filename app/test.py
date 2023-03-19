@@ -10,80 +10,117 @@ from PIL import Image
 from app import AE_GEN as ae
 import numpy as np
 
-# TODO mieux gerer la fin a plusieur images
-# TODO export image
-
-
 img_path = "../dataset/00000/"
 last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
-dir_cache  = ".cache/"
-fun = False
+dir_cache = ".cache/"
+fun = False  # Fun mode
 
-H = 64
-W = 64
-C = 3
+H = 64  # Hauteur des images
+W = 64  # Largeur des images
+C = 3  # 3 si RGB 1 si N&B
 
-def make_thumbnail(list_img):
+
+def Make_thumbnail(list_img):
+    """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
+    nommé "thumbnailed.png".
+
+    Args:
+        list_img (list): Une liste d'images à utiliser pour créer la miniature.
+
+    Returns:
+        str: Le chemin du fichier "thumbnailed.png" créé.
+
+    Raises:
+        Aucune erreur n'est levée dans cette fonction.
+    """
+    # TODO Faire plus propre
     if len(list_img) > 4:
         row = 3
         col = 2
-    elif len(list_img) >1 :
+    elif len(list_img) > 1:
         row = 2
         col = 2
-    else :
+    else:
         row = 1
         col = 1
-    dst = Image.new('RGB', (W*col, H*row))
+    collage = Image.new('RGB', (W * col, H * row))
     opened = []
     for i in list_img:
-       opened.append(Image.open(i).resize((H, W)))
+        opened.append(Image.open(i).resize((H, W)))
     for i, im in enumerate(opened):
-        if i <2:
-            dst.paste(im, (i*W, 0))
-        elif i ==2:
-            dst.paste(im, (0, H))
+        if i < 2:
+            collage.paste(im, (i * W, 0))
+        elif i == 2:
+            collage.paste(im, (0, H))
         elif i == 3:
-            dst.paste(im, (W, H))
+            collage.paste(im, (W, H))
         elif i == 4:
-            dst.paste(im, (0, 2*H))
+            collage.paste(im, (0, 2 * H))
         else:
-            dst.paste(im, (W, H*2))
-    dst.save(f"{dir_cache}thumbnailed.png")
+            collage.paste(im, (W, H * 2))
+    collage.save(f"{dir_cache}thumbnailed.png")
     return f"{dir_cache}thumbnailed.png"
 
-def init_photo_frame():
-    for r in range(Application.row):
-        Application.photo_frame[r] = {}
-        for c in range(Application.col):
-            Application.photo_frame[r][c] = None
 
-
-def change_temp(files):
-    for d in os.listdir(past_temp):
-        os.remove(f"{past_temp}{d}")
-    for f in files:
-        shutil.copyfile(f, f"{past_temp}/{f.split('/')[-1]}")
-
-
-def random_img():
+def init_dict(nb_row, nb_col):
+    """Initialise un dictionaire python avec des Nones de la forme :
+        {"R": {"C" : None} * x } * y --> Tableau 2D
+    avec x = nb_col, y = nb_row et C et R des entiers de 0 au nombre maximal.
+    Args:
+        nb_row (int) : Nombre de "ligne"
+        nb_col (int) : Nombre de "colonne"
+    Returns:
+        dict_ (dict) : Dictionaire
     """
-        Retourne une image aléatoire parmi une liste d'images.
+    dict_ = {}
+    for r in range(nb_row):
+        dict_[r] = {}
+        for c in range(nb_col):
+            dict_[r][c] = None
+    return dict_
 
+
+def change_temp(files, dir_clean=past_temp, dir_dest=past_temp):
+    """Suprimme les fichiers stocker dans past_temp et place dans ce dossier la derniere generation d'images choisie
+
+    Args:
+        files (list) : Liste avec les paths des images de la derniere generation
+        dir_clean (str) : Path vers le dossier à vider
+        dir_dest (str) : PAth vers le dossier à remplir
+    """
+    for d in os.listdir(dir_clean):
+        os.remove(f"{dir_clean}{d}")
+    for f in files:
+        print(f)
+        shutil.copyfile(f, f"{dir_dest}/{f.split('/')[-1]}")
+
+
+def random_img(dir_choice=img_path):
+    """
+        Retourne une image aléatoire parmi les images dans dir_choice.
+        Args:
+            dir_choice (str) : Chemin vers le dossier avec les images
         Returns:
-            str: Chemin d'accès vers l'image aléatoire sélectionnée.
+            random_image (str) : Chemin d'accès vers l'image aléatoire sélectionnée.
         """
-    images = glob.glob(random.choice([img_path + "*.png"]))
+    images = glob.glob(random.choice([dir_choice + "*.png"]))
     random_image = random.choice(images)
     return random_image
 
 
 def created_img():
+    """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
+    2 ligne 3 colonnes
+
+    Returns:
+        img_lst (list) : Liste des path d'image dans muted_path sous la forme [2][3]
+    """
     files = os.listdir(muted_path)
     for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
-    files.append(files[-1])
+    files.append(random_img())
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
     return img_lst
@@ -97,7 +134,8 @@ def get_frame_size(frame):
         frame (Tkinter.Frame): Cadre dont la taille doit être récupérée.
 
     Returns:
-        tuple: Largeur et hauteur du cadre.
+        w: Largeur de frame.
+        h: Hauteur de frame
     """
     frame.update()
     w = frame.winfo_width()
@@ -114,7 +152,7 @@ def convert_photoimg(source, size):
             size (tuple): Largeur et hauteur de l'image redimensionnée.
 
         Returns:
-            tkinter.PhotoImage: Objet PhotoImage de l'image convertie et redimensionnée.
+            photo_image (tkinter.PhotoImage): Objet PhotoImage de l'image convertie et redimensionnée.
         """
     if size is None:
         photo_image = ctk.CTkImage(light_image=Image.open(source), dark_image=Image.open(source))
@@ -125,10 +163,9 @@ def convert_photoimg(source, size):
 
 
 class Pastchoice(ctk.CTkScrollableFrame):
-    # TODO past_temp et past a faire avec les bon path par geenration et afficher image multiple sur scroll
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-        self.count = 0
+        self.count = 0  # Nombre de generation précédentes
         self.all_past = {}
 
     def add_img(self, size):
@@ -150,7 +187,8 @@ class Pastchoice(ctk.CTkScrollableFrame):
             shutil.copyfile(source_img, new_path)
             shutil.copyfile(source_img, f"{past_temp}{end_path}")
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
-                            command=lambda cnt=self.count, source= Application.selected_source["source"]: self.go_past(cnt),
+                            command=lambda cnt=self.count, source=Application.selected_source["source"]: self.go_past(
+                                cnt),
                             image=convert_photoimg(Application.selected_source["thumbnail"], size), text=self.count,
                             compound="bottom")
         old.pack(side="bottom", pady=(5, 5))
@@ -173,26 +211,25 @@ class Pastchoice(ctk.CTkScrollableFrame):
             if os.path.exists(path):
                 shutil.rmtree(path)
             self.all_past.pop(i)
-        files = []
-        for f in os.listdir(f"{last_path}{self.count}"):
-            files.append(f"{last_path}{self.count}/{f}")
-        change_temp(files)
+        files = {}
+        for i, f in enumerate(os.listdir(f"{last_path}{self.count}")):
+            files[i] = f"{last_path}{self.count}/{f}"
+        change_temp(list(files.values()))
         Application.selected_source["source"] = files
         Application.new_image()
 
 
 class Application(ctk.CTk):
-    photo_frame = {}
     size_photo = None
-    selected_source = {"thumbnail":str, "source":{}}
-    never = True
+    selected_source = {"thumbnail": str(), "source": {}}
+    never = True  # Y a t-il deja eu une generation  d'image
     col = 3
     row = 2
+    photo_frame = init_dict(row, col)
 
     def __init__(self):
         super().__init__()
         self.delay = None
-        init_photo_frame()
         self.toplevel = None
         self.end_btn = None
         self.h_past = None
@@ -301,12 +338,12 @@ class Application(ctk.CTk):
                                          command=lambda coords=(r, c): self.button_click(coords), text="_"),
                     'clicked': False, 'order': None, 'source': ""}
                 Application.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
+                #TODO implementer le double click qui declanche unselect_all
                 w, h = get_frame_size(right)
                 w = w // Application.col + 1
                 h = h // Application.row + 1
                 Application.size_photo = (w, h)
         self.new_image()
-
 
     def button_click(self, coords):
         """Change l'état d'un bouton de photo lorsqu'il est cliqué.
@@ -325,7 +362,6 @@ class Application(ctk.CTk):
             focus_btn['clicked'] = False
             Application.selected_source["source"].pop(f"{r}_{c}")
         else:
-            #self.unselect_all()
             focus_btn['btn'].configure(fg_color="darkgreen")
             focus_btn['clicked'] = True
             Application.selected_source["source"][f"{r}_{c}"] = focus_btn["source"]
@@ -334,11 +370,12 @@ class Application(ctk.CTk):
         self.unselect_all()
         f = list(Application.selected_source["source"].values())
         self.end_btn.configure(state="normal")
-        Application.selected_source["thumbnail"] = make_thumbnail(f)
+        Application.selected_source["thumbnail"] = Make_thumbnail(f)
         self.scroll_left.add_img((self.w_past, self.h_past))
         change_temp(list(Application.selected_source["source"].values()))
         Application.new_image()
-        Application.selected_source["source"] = {}
+        Application.selected_source[
+            "source"] = {}  # TODO resoudre warning Expected type 'dict', got 'Dict[str, Union[str, Any]]' instead
 
     def unselect_all(self):
         """
@@ -436,25 +473,28 @@ class Application(ctk.CTk):
         global fun
         fun = False
         self.end()
+
     def Subselect(self, source):
-        Application.selected_source= {"source":{"selected":source}}
-        self.end()
+        Application.selected_source = {"source": {"selected": source}}
+        self.save_coupable()
+
     def end(self):
+
         source_list = list(Application.selected_source["source"].values())
-        if len(source_list)==0:
+        print(source_list)
+        if len(source_list) == 0:
             print("no selected")
             temp = os.listdir(past_temp)
             for t in temp:
                 source_list.append(f"{past_temp}{t}")
             print(source_list)
-        if len(source_list)>1:
-            print("decalnche top frame")
+        if len(source_list) > 1:
             top = tk.Toplevel(self)
             top.title("SubSelect")
             for i in source_list:
                 export_image = ctk.CTkButton(top,
                                              image=ImageTk.PhotoImage(Image.open(i)),
-                                             compound="bottom",  command= lambda x = i: self.Subselect(x),
+                                             compound="bottom", command=lambda x=i: self.Subselect(x),
                                              text="export image", fg_color="darkgrey", hover_color="grey")
                 export_image.pack()
 
@@ -469,9 +509,11 @@ class Application(ctk.CTk):
                 self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
                 export_image = ctk.CTkButton(self.toplevel,
                                              image=ImageTk.PhotoImage(Image.open(source_list[0])),
-                                             compound="bottom",
+                                             compound="bottom", command = lambda: self.save_coupable(),
                                              text="export image", fg_color="darkgrey", hover_color="grey")
                 export_image.grid(row=0, column=0, sticky="nsew")
+    def save_coupable(self):
+        print(f"coupable : {Application.selected_source}")
 
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
