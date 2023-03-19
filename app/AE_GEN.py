@@ -22,9 +22,9 @@ tf.random.set_seed(42)
 H = 64
 W = 64
 C = 3
-encoder = tf.keras.models.load_model('saved_model/encoder.tf', compile=False)
+encoder = tf.keras.models.load_model('../saved_model/encoder.tf', compile=False)
 # encoder.summary()
-decoder = tf.keras.models.load_model('saved_model/decoder.tf', compile=False)
+decoder = tf.keras.models.load_model('../saved_model/decoder.tf', compile=False)
 # decoder.summary()
 
 encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
@@ -49,9 +49,9 @@ def implement_img():
                 arr = np.array(img) / 255
                 X.append(arr)
     else:
-        for file in os.listdir(f"dataset/06000/"):
+        for file in os.listdir(f"../dataset/06000/"):
             if file != ".DS_Store":
-                img = Image.open(f"dataset/06000/{file}")
+                img = Image.open(f"../dataset/06000/{file}")
                 t = 64
                 img = img.resize((t, t))
                 arr = np.array(img) / 255

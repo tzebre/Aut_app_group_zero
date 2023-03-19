@@ -7,14 +7,14 @@ import shutil
 import random
 import os
 from PIL import Image
-import AE_GEN as ae
+from app import AE_GEN as ae
 import numpy as np
 
 # TODO mieux gerer la fin a plusieur images
 # TODO export image
 
 
-img_path = "dataset/00000/"
+img_path = "../dataset/00000/"
 last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
@@ -371,7 +371,7 @@ class Application(ctk.CTk):
         cls.unselect_all(cls)
         if Application.never:
             for i in range(1, 6):
-                shutil.copyfile(f"dataset/00000/0000{i}.png", f"{muted_path}0000{i}.png")
+                shutil.copyfile(f"{img_path}0000{i}.png", f"{muted_path}0000{i}.png")
         else:
             ae.main_genetic_algorithm()
         Application.never = False
