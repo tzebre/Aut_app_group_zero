@@ -49,9 +49,9 @@ def implement_img():
                 arr = np.array(img) / 255
                 X.append(arr)
     else:
-        for file in os.listdir(f"../dataset/06000/"):
+        for file in os.listdir(f"00000/"):
             if file != ".DS_Store":
-                img = Image.open(f"../dataset/06000/{file}")
+                img = Image.open(f"00000/{file}")
                 t = 64
                 img = img.resize((t, t))
                 arr = np.array(img) / 255

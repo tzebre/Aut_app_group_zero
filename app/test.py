@@ -7,10 +7,11 @@ import shutil
 import random
 import os
 from PIL import Image
-from app import AE_GEN as ae
+import AE_GEN as ae
 import numpy as np
+import pdf as pdf_exp
 
-img_path = "../dataset/00000/"
+img_path = "00000/"
 last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
@@ -22,7 +23,11 @@ W = 64  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
 
 def export_pdf():
-    print("export")
+    print(Application.selected_source["source"].values())
+    path = list(Application.selected_source["source"].values())[0]
+    pdf_exp.set_value("auteur","THEO")
+    pdf_exp.main(path)
+    app.quit()
 def Make_thumbnail(list_img):
     """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
     nommé "thumbnailed.png".
@@ -489,7 +494,8 @@ class Application(ctk.CTk):
             for t in temp:
                 source_list.append(f"{past_temp}{t}")
             print(source_list)
-        if len(source_list) > 1:
+            Application.selected_source = {"source": {"selected": source_list[0]}}
+        elif len(source_list) > 1:
             top = tk.Toplevel(self)
             top.title("SubSelect")
             for i in source_list:
