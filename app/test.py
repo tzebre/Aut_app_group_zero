@@ -21,7 +21,8 @@ H = 64  # Hauteur des images
 W = 64  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
 
-
+def export_pdf():
+    print("export")
 def Make_thumbnail(list_img):
     """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
     nommé "thumbnailed.png".
@@ -514,6 +515,7 @@ class Application(ctk.CTk):
                 export_image.grid(row=0, column=0, sticky="nsew")
     def save_coupable(self):
         print(f"coupable : {Application.selected_source}")
+        export_pdf()
 
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
