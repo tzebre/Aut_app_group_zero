@@ -12,6 +12,7 @@ import pdf as pdf_exp
 import uuid
 import random
 import string
+from math import ceil, sqrt
 from datetime import datetime
 
 img_path = "00000/"
@@ -31,14 +32,23 @@ def rdm_le(x, bool):
         return random.choice(string.ascii_uppercase)[:x]
     else:
         return random.choice(string.ascii_lowercase)[:x]
+
+
 def export_pdf(value):
     print(Application.selected_source["source"].values())
-    #TODO set all atributes
-    #TODO set history
+    # TODO set all atributes
+    # TODO set history
     print(value)
-    path = list(Application.selected_source["source"].values())[0]
+    list_img = []
+    for dir_i in os.listdir(last_path):
+        for i in os.listdir(f"{last_path}{dir_i}"):
+            list_img.append(f"{last_path}{dir_i}/{i}")
+    print(list_img)
+    path = [list(Application.selected_source["source"].values())[0],Make_thumbnail(list_img)]
     pdf_exp.main(value, path)
     app.quit()
+
+
 def Make_thumbnail(list_img):
     """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
     nommé "thumbnailed.png".
@@ -52,31 +62,21 @@ def Make_thumbnail(list_img):
     Raises:
         Aucune erreur n'est levée dans cette fonction.
     """
-    # TODO Faire plus propre
-    if len(list_img) > 4:
-        row = 3
-        col = 2
-    elif len(list_img) > 1:
-        row = 2
-        col = 2
-    else:
-        row = 1
-        col = 1
-    collage = Image.new('RGB', (W * col, H * row))
-    opened = []
+    N = len(list_img)
+    x = ceil(sqrt(N))
+    c = 0
+    r = 0
+    collage = Image.new('RGB', (W * x, H * x))
     for i in list_img:
-        opened.append(Image.open(i).resize((H, W)))
-    for i, im in enumerate(opened):
-        if i < 2:
-            collage.paste(im, (i * W, 0))
-        elif i == 2:
-            collage.paste(im, (0, H))
-        elif i == 3:
-            collage.paste(im, (W, H))
-        elif i == 4:
-            collage.paste(im, (0, 2 * H))
-        else:
-            collage.paste(im, (W, H * 2))
+        if c == (x):
+            print("in")
+            c = 0
+            r += 1
+        print(r,c)
+        collage.paste(Image.open(i).resize((H, W)), (W*c, H * r))
+        c += 1
+
+
     collage.save(f"{dir_cache}thumbnailed.png")
 
     return f"{dir_cache}thumbnailed.png"
@@ -204,7 +204,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
             new_path = new_dir + end_path
             shutil.copyfile(source_img, new_path)
             shutil.copyfile(source_img, f"{past_temp}{end_path}")
-        print("thumb",Application.selected_source["thumbnail"], size)
+        print("thumb", Application.selected_source["thumbnail"], size)
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
                             command=lambda cnt=self.count, source=Application.selected_source["source"]: self.go_past(
                                 cnt),
@@ -251,8 +251,8 @@ class Application(ctk.CTk):
         self.info_entry = None
         self.delay = None
         self.value = {"rapport": f"{rdm_le(1, True)}{str(uuid.uuid4())[:3]}{rdm_le(1, False)}{str(uuid.uuid4())[:4]}",
-                  "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S"), "auteur": "", "victime": "", "enquete": "",
-                  "remarque_enquete": "", "remarque_photo": ""}
+                      "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S"), "auteur": "", "victime": "", "enquete": "",
+                      "remarque_enquete": "", "remarque_photo": ""}
 
         self.toplevel = None
         self.end_btn = None
@@ -268,12 +268,14 @@ class Application(ctk.CTk):
         self.make_frame()
         self.enter_info()
         # self.accueil()
+
     def enter_info(self):
         self.withdraw()
         frame_info = tk.Toplevel(self)
         frame_info.title("Enter info")
         frame_info.update()
-        frame_info.geometry("+%d+%d" % ((self.winfo_screenwidth()//2)-(frame_info.winfo_width()//2), (self.winfo_screenheight()//2)-(frame_info.winfo_height()//2)))
+        frame_info.geometry("+%d+%d" % ((self.winfo_screenwidth() // 2) - (frame_info.winfo_width() // 2),
+                                        (self.winfo_screenheight() // 2) - (frame_info.winfo_height() // 2)))
         frame_info.grid_columnconfigure(0, weight=1, uniform="group1")
         frame_info.grid_columnconfigure(1, weight=1, uniform="group1")
         frame_info.grid_rowconfigure(0, weight=1, uniform="group1")
@@ -292,14 +294,13 @@ class Application(ctk.CTk):
         enq_L.grid(row=2, column=0)
         enq_E = ctk.CTkEntry(frame_info, placeholder_text="Enquete n°")
         enq_E.grid(row=2, column=1)
-        self.info_entry = [frame_info,auteur_E, vic_E, enq_E]
-        val_btn = ctk.CTkButton(frame_info, text="Validation", command=lambda:self.start_choice())
+        self.info_entry = [frame_info, auteur_E, vic_E, enq_E]
+        val_btn = ctk.CTkButton(frame_info, text="Validation", command=lambda: self.start_choice())
         val_btn.grid(row=3, column=0, columnspan=2)
 
     def start_choice(self):
-
         val = ["auteur", "victime", "enquete"]
-        for i,e in enumerate(self.info_entry[1:]):
+        for i, e in enumerate(self.info_entry[1:]):
             self.value[val[i]] = str(e.get())
         self.info_entry[0].destroy()
         self.deiconify()
@@ -399,7 +400,7 @@ class Application(ctk.CTk):
                                          command=lambda coords=(r, c): self.button_click(coords), text="_"),
                     'clicked': False, 'order': None, 'source': ""}
                 Application.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
-                #TODO implementer le double click qui declanche unselect_all
+                # TODO implementer le double click qui declanche unselect_all
                 w, h = get_frame_size(right)
                 w = w // Application.col + 1
                 h = h // Application.row + 1
@@ -548,15 +549,11 @@ class Application(ctk.CTk):
         self.save_coupable()
 
     def end(self):
-
         source_list = list(Application.selected_source["source"].values())
-        print(source_list)
         if len(source_list) == 0:
-            print("no selected")
             temp = os.listdir(past_temp)
             for t in temp:
                 source_list.append(f"{past_temp}{t}")
-            print(source_list)
             Application.selected_source = {"source": {"selected": source_list[0]}}
         if len(source_list) > 1:
             top = tk.Toplevel(self)
@@ -579,9 +576,10 @@ class Application(ctk.CTk):
                 self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
                 export_image = ctk.CTkButton(self.toplevel,
                                              image=ImageTk.PhotoImage(Image.open(source_list[0])),
-                                             compound="bottom", command = lambda: self.save_coupable(),
+                                             compound="bottom", command=lambda: self.save_coupable(),
                                              text="export image", fg_color="darkgrey", hover_color="grey")
                 export_image.grid(row=0, column=0, sticky="nsew")
+
     def save_coupable(self):
         print(f"coupable : {Application.selected_source}")
         export_pdf(self.value)
