@@ -16,7 +16,9 @@ from numpy import asarray
 from math import ceil, sqrt
 from datetime import datetime
 import json
+from tkinter.filedialog import asksaveasfile
 
+# TODO si validation finale avant le premier next = BUG
 img_path = "00000/"
 last_path = ".past/"
 muted_path = ".img/"
@@ -47,14 +49,16 @@ def export_pdf(value, json_):
     end_img = list(Application.selected_source["source"].values())[0]
     path = [end_img,hist_img, "qr_code.png"]
     if json_:
+        file_json = asksaveasfile(filetypes=[('json Files', '*.json')])
         """
         value["Portrait_robot"] = asarray(Image.open(end_img)).tolist()
         value["History"] = asarray(Image.open(hist_img)).tolist()
         value["qr_code"] = asarray(Image.open("qr_code.png")).tolist()
         """
-        with open('json_data.json', 'w') as outfile:
+        with open(file_json.name, 'w') as outfile:
             outfile.write(json.dumps(value))
-    pdf_exp.main(value, path)
+    file_pdf = asksaveasfile(filetypes=[('pdf Files', '*.pdf')])
+    pdf_exp.main(value, path, file_pdf.name)
     app.quit()
 
 
@@ -78,10 +82,8 @@ def Make_thumbnail(list_img, color = 0):
     collage = Image.new('RGB', (W * x, H * x),color = (color,color,color))
     for i in list_img:
         if c == (x):
-            print("in")
             c = 0
             r += 1
-        print(r,c)
         collage.paste(Image.open(i).resize((H, W)), (W*c, H * r))
         c += 1
 
@@ -120,7 +122,6 @@ def change_temp(files, dir_clean=past_temp, dir_dest=past_temp):
     for d in os.listdir(dir_clean):
         os.remove(f"{dir_clean}{d}")
     for f in files:
-        print(f)
         shutil.copyfile(f, f"{dir_dest}/{f.split('/')[-1]}")
 
 
@@ -213,7 +214,6 @@ class Pastchoice(ctk.CTkScrollableFrame):
             new_path = new_dir + end_path
             shutil.copyfile(source_img, new_path)
             shutil.copyfile(source_img, f"{past_temp}{end_path}")
-        print("thumb", Application.selected_source["thumbnail"], size)
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
                             command=lambda cnt=self.count, source=Application.selected_source["source"]: self.go_past(
                                 cnt),
@@ -590,7 +590,6 @@ class Application(ctk.CTk):
                 export_image.grid(row=0, column=0, sticky="nsew")
 
     def save_coupable(self):
-        print(f"coupable : {Application.selected_source}")
         export_pdf(self.value, True)
 
 

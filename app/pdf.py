@@ -1,5 +1,4 @@
 from PyPDF2 import PdfWriter, PdfReader
-import aspose.pdf as pdf
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -22,7 +21,7 @@ start = {"rapport": (84, 842 - 218), "date": (48, 842 - 237), "auteur": (10, 842
          "remarque_photo": (401, 842 - 660)}
 
 
-def main(value, path="etst.png"):
+def main(value, path="etst.png", dest = "report.pdf"):
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=A4)
     for k in start:
@@ -48,7 +47,7 @@ def main(value, path="etst.png"):
     page = existing_pdf.pages[0]
     page.merge_page(new_pdf.pages[0])
     output.add_page(page)
-    output_stream = open("report.pdf", "wb")
+    output_stream = open(dest, "wb")
     output.write(output_stream)
     output_stream.close()
 
