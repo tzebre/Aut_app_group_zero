@@ -12,8 +12,10 @@ import pdf as pdf_exp
 import uuid
 import random
 import string
+from numpy import asarray
 from math import ceil, sqrt
 from datetime import datetime
+import json
 
 img_path = "00000/"
 last_path = ".past/"
@@ -34,22 +36,29 @@ def rdm_le(x, bool):
         return random.choice(string.ascii_lowercase)[:x]
 
 
-def export_pdf(value):
-    print(Application.selected_source["source"].values())
-    # TODO set all atributes
-    # TODO set history
-    print(value)
+def export_pdf(value, json_):
+    id = value["rapport"]
+    pdf_exp.make_qr(id)
     list_img = []
-    for dir_i in os.listdir(last_path):
-        for i in os.listdir(f"{last_path}{dir_i}"):
+    for dir_i in range(1,len(os.listdir(last_path))+1):
+        for i in os.listdir(f"{last_path}{dir_i}/"):
             list_img.append(f"{last_path}{dir_i}/{i}")
-    print(list_img)
-    path = [list(Application.selected_source["source"].values())[0],Make_thumbnail(list_img)]
+    hist_img = Make_thumbnail(list_img, 255)
+    end_img = list(Application.selected_source["source"].values())[0]
+    path = [end_img,hist_img, "qr_code.png"]
+    if json_:
+        """
+        value["Portrait_robot"] = asarray(Image.open(end_img)).tolist()
+        value["History"] = asarray(Image.open(hist_img)).tolist()
+        value["qr_code"] = asarray(Image.open("qr_code.png")).tolist()
+        """
+        with open('json_data.json', 'w') as outfile:
+            outfile.write(json.dumps(value))
     pdf_exp.main(value, path)
     app.quit()
 
 
-def Make_thumbnail(list_img):
+def Make_thumbnail(list_img, color = 0):
     """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
     nommé "thumbnailed.png".
 
@@ -66,7 +75,7 @@ def Make_thumbnail(list_img):
     x = ceil(sqrt(N))
     c = 0
     r = 0
-    collage = Image.new('RGB', (W * x, H * x))
+    collage = Image.new('RGB', (W * x, H * x),color = (color,color,color))
     for i in list_img:
         if c == (x):
             print("in")
@@ -582,7 +591,7 @@ class Application(ctk.CTk):
 
     def save_coupable(self):
         print(f"coupable : {Application.selected_source}")
-        export_pdf(self.value)
+        export_pdf(self.value, True)
 
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
