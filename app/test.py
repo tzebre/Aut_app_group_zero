@@ -4,12 +4,15 @@ from PIL import ImageTk
 import glob
 from itertools import count, cycle
 import shutil
-import random
 import os
 from PIL import Image
 import AE_GEN as ae
 import numpy as np
 import pdf as pdf_exp
+import uuid
+import random
+import string
+from datetime import datetime
 
 img_path = "00000/"
 last_path = ".past/"
@@ -22,11 +25,19 @@ H = 64  # Hauteur des images
 W = 64  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
 
-def export_pdf():
+
+def rdm_le(x, bool):
+    if bool:
+        return random.choice(string.ascii_uppercase)[:x]
+    else:
+        return random.choice(string.ascii_lowercase)[:x]
+def export_pdf(value):
     print(Application.selected_source["source"].values())
+    #TODO set all atributes
+    #TODO set history
+    print(value)
     path = list(Application.selected_source["source"].values())[0]
-    pdf_exp.set_value("auteur","THEO")
-    pdf_exp.main(path)
+    pdf_exp.main(value, path)
     app.quit()
 def Make_thumbnail(list_img):
     """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
@@ -67,6 +78,7 @@ def Make_thumbnail(list_img):
         else:
             collage.paste(im, (W, H * 2))
     collage.save(f"{dir_cache}thumbnailed.png")
+
     return f"{dir_cache}thumbnailed.png"
 
 
@@ -192,6 +204,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
             new_path = new_dir + end_path
             shutil.copyfile(source_img, new_path)
             shutil.copyfile(source_img, f"{past_temp}{end_path}")
+        print("thumb",Application.selected_source["thumbnail"], size)
         old = ctk.CTkButton(self, fg_color="grey", hover_color="palegreen",
                             command=lambda cnt=self.count, source=Application.selected_source["source"]: self.go_past(
                                 cnt),
@@ -235,7 +248,12 @@ class Application(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+        self.info_entry = None
         self.delay = None
+        self.value = {"rapport": f"{rdm_le(1, True)}{str(uuid.uuid4())[:3]}{rdm_le(1, False)}{str(uuid.uuid4())[:4]}",
+                  "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S"), "auteur": "", "victime": "", "enquete": "",
+                  "remarque_enquete": "", "remarque_photo": ""}
+
         self.toplevel = None
         self.end_btn = None
         self.h_past = None
@@ -247,8 +265,45 @@ class Application(ctk.CTk):
         self.frames = None
         self.title("zero")
         self.info()
-        # self.accueil()
         self.make_frame()
+        self.enter_info()
+        # self.accueil()
+    def enter_info(self):
+        self.withdraw()
+        frame_info = tk.Toplevel(self)
+        frame_info.title("Enter info")
+        frame_info.update()
+        frame_info.geometry("+%d+%d" % ((self.winfo_screenwidth()//2)-(frame_info.winfo_width()//2), (self.winfo_screenheight()//2)-(frame_info.winfo_height()//2)))
+        frame_info.grid_columnconfigure(0, weight=1, uniform="group1")
+        frame_info.grid_columnconfigure(1, weight=1, uniform="group1")
+        frame_info.grid_rowconfigure(0, weight=1, uniform="group1")
+        frame_info.grid_rowconfigure(1, weight=1, uniform="group1")
+        frame_info.grid_rowconfigure(2, weight=1, uniform="group1")
+        frame_info.grid_rowconfigure(3, weight=1, uniform="group1")
+        auteur_L = ctk.CTkLabel(frame_info, text="Auteur")
+        auteur_L.grid(row=0, column=0)
+        auteur_E = ctk.CTkEntry(frame_info, placeholder_text="Auteur")
+        auteur_E.grid(row=0, column=1)
+        vic_L = ctk.CTkLabel(frame_info, text="Victime")
+        vic_L.grid(row=1, column=0)
+        vic_E = ctk.CTkEntry(frame_info, placeholder_text="Victime")
+        vic_E.grid(row=1, column=1)
+        enq_L = ctk.CTkLabel(frame_info, text="Enquete n°")
+        enq_L.grid(row=2, column=0)
+        enq_E = ctk.CTkEntry(frame_info, placeholder_text="Enquete n°")
+        enq_E.grid(row=2, column=1)
+        self.info_entry = [frame_info,auteur_E, vic_E, enq_E]
+        val_btn = ctk.CTkButton(frame_info, text="Validation", command=lambda:self.start_choice())
+        val_btn.grid(row=3, column=0, columnspan=2)
+
+    def start_choice(self):
+
+        val = ["auteur", "victime", "enquete"]
+        for i,e in enumerate(self.info_entry[1:]):
+            self.value[val[i]] = str(e.get())
+        self.info_entry[0].destroy()
+        self.deiconify()
+        self.info()
 
     def info(self):
         """
@@ -373,15 +428,23 @@ class Application(ctk.CTk):
             Application.selected_source["source"][f"{r}_{c}"] = focus_btn["source"]
 
     def next(self):
-        self.unselect_all()
-        f = list(Application.selected_source["source"].values())
-        self.end_btn.configure(state="normal")
-        Application.selected_source["thumbnail"] = Make_thumbnail(f)
-        self.scroll_left.add_img((self.w_past, self.h_past))
-        change_temp(list(Application.selected_source["source"].values()))
-        Application.new_image()
-        Application.selected_source[
-            "source"] = {}  # TODO resoudre warning Expected type 'dict', got 'Dict[str, Union[str, Any]]' instead
+        min_one = False
+        for r in self.photo_frame.values():
+            for c in r.values():
+                if c["clicked"]:
+                    min_one = True
+                    break
+
+        if min_one:
+            self.unselect_all()
+            f = list(Application.selected_source["source"].values())
+            self.end_btn.configure(state="normal")
+            Application.selected_source["thumbnail"] = Make_thumbnail(f)
+            self.scroll_left.add_img((self.w_past, self.h_past))
+            change_temp(list(Application.selected_source["source"].values()))
+            Application.new_image()
+            Application.selected_source[
+                "source"] = {}  # TODO resoudre warning Expected type 'dict', got 'Dict[str, Union[str, Any]]' instead
 
     def unselect_all(self):
         """
@@ -495,7 +558,7 @@ class Application(ctk.CTk):
                 source_list.append(f"{past_temp}{t}")
             print(source_list)
             Application.selected_source = {"source": {"selected": source_list[0]}}
-        elif len(source_list) > 1:
+        if len(source_list) > 1:
             top = tk.Toplevel(self)
             top.title("SubSelect")
             for i in source_list:
@@ -521,7 +584,7 @@ class Application(ctk.CTk):
                 export_image.grid(row=0, column=0, sticky="nsew")
     def save_coupable(self):
         print(f"coupable : {Application.selected_source}")
-        export_pdf()
+        export_pdf(self.value)
 
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:

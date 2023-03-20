@@ -14,12 +14,10 @@ def rdm_le(x, bool):
         return random.choice(string.ascii_lowercase)[:x]
 
 start = {"rapport" : (84, 842-218), "date" : (48, 842-237), "auteur":(10, 842-(279+17)), "victime":(10, 842-(349+17)), "enquete":(81, 842-416),"remarque_enquete":(8, 842-480),"remarque_photo":(401, 842-660)}
-value = {"rapport" : f"{rdm_le(1,True)}{str(uuid.uuid4())[:3]}{rdm_le(1,False)}{str(uuid.uuid4())[:4]}", "date" : datetime.now().strftime("%d/%m/%Y %H:%M:%S"), "auteur": "", "victime":"", "enquete":"","remarque_enquete":"","remarque_photo":""}
-def set_value(what, val):
-    value[what] = val
 
 
-def main(path = "etst.png"):
+
+def main( value,path = "etst.png"):
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=A4)
     for k in start:
