@@ -23,7 +23,7 @@ last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
 dir_cache = ".cache/"
-fun = False  # Fun mode
+fun = True  # Fun mode
 
 H = 64  # Hauteur des images
 W = 64  # Largeur des images
@@ -38,6 +38,7 @@ def rdm_le(x, bool):
 
 
 def export_pdf(value, json_):
+    print(Application.selected_source)
     id = value["rapport"]
     pdf_exp.make_qr(id)
     list_img = []
@@ -582,6 +583,9 @@ class Application(ctk.CTk):
                 self.end_gif()
             else:
                 # ajouter verif de si ca vous va
+                f = list(Application.selected_source["source"].values())[0]
+                Application.selected_source = {
+                    "source": {"selected": f, "all":f}}
 
                 self.toplevel = tk.Toplevel(self)
                 self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
