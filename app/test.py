@@ -17,17 +17,22 @@ from math import ceil, sqrt
 from datetime import datetime
 import json
 from tkinter.filedialog import asksaveasfile
-#TODO mieux gerer les cas ou mutiselection sans next (declancher un next pas encore eu dans le cas ou validation finale avant ?)
+
+# TODO mieux gerer les cas ou mutiselection sans next (declancher un next pas encore eu dans le cas ou validation finale avant ?)
 img_path = "00000/"
 last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
 dir_cache = ".cache/"
-fun = True  # Fun mode
+fun = False  # Fun mode
 
 H = 64  # Hauteur des images
 W = 64  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
+
+
+def get_all_hist_path():
+    return []
 
 
 def rdm_le(x, bool):
@@ -37,21 +42,12 @@ def rdm_le(x, bool):
         return random.choice(string.ascii_lowercase)[:x]
 
 
-def export_pdf(value, json_):
-    print(Application.selected_source)
+def export_pdf(value, hist_list, end_path, json_):
+    # TODO give path_hist et path_end
     id = value["rapport"]
     pdf_exp.make_qr(id)
-    list_img = []
-    if len(os.listdir(last_path)) !=0:
-        for dir_i in range(1,len(os.listdir(last_path))+1):
-            for i in os.listdir(f"{last_path}{dir_i}/"):
-                list_img.append(f"{last_path}{dir_i}/{i}")
-        end_img = list(Application.selected_source["source"].values())[0]
-    else:
-        list_img = Application.selected_source["source"]["all"]
-        end_img = Application.selected_source["source"]["selected"]
-    hist_img = Make_thumbnail(list_img, 255)
-    path = [end_img,hist_img, "qr_code.png"]
+    hist_img = Make_thumbnail(hist_list, 255)
+    path = [end_path, hist_img, "qr_code.png"]
     if json_:
         file_json = asksaveasfile(filetypes=[('json Files', '*.json')])
         """
@@ -66,7 +62,7 @@ def export_pdf(value, json_):
     app.quit()
 
 
-def Make_thumbnail(list_img, color = 0):
+def Make_thumbnail(list_img, color=0):
     """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
     nommé "thumbnailed.png".
 
@@ -83,14 +79,13 @@ def Make_thumbnail(list_img, color = 0):
     x = ceil(sqrt(N))
     c = 0
     r = 0
-    collage = Image.new('RGB', (W * x, H * x),color = (color,color,color))
+    collage = Image.new('RGB', (W * x, H * x), color=(color, color, color))
     for i in list_img:
         if c == (x):
             c = 0
             r += 1
-        collage.paste(Image.open(i).resize((H, W)), (W*c, H * r))
+        collage.paste(Image.open(i).resize((H, W)), (W * c, H * r))
         c += 1
-
 
     collage.save(f"{dir_cache}thumbnailed.png")
 
@@ -253,7 +248,8 @@ class Pastchoice(ctk.CTkScrollableFrame):
 
 class Application(ctk.CTk):
     size_photo = None
-    selected_source = {"thumbnail": str(), "source": {}}
+    selected_source = {"thumbnail": "", "source": {}}
+    report = {"history": [], "end": ""}
     never = True  # Y a t-il deja eu une generation  d'image
     col = 3
     row = 2
@@ -280,7 +276,6 @@ class Application(ctk.CTk):
         self.info()
         self.make_frame()
         self.enter_info()
-        # self.accueil()
 
     def enter_info(self):
         self.withdraw()
@@ -334,18 +329,6 @@ class Application(ctk.CTk):
         x = 0
         y = 0
         self.geometry("{}x{}+{}+{}".format(w, h, int(x), int(y)))
-
-    # def accueil(self):
-    #     btm = tk.Frame()
-    #     im = Image.open('./file/logo.png')
-    #     logo = ImageTk.PhotoImage(im, master=btm)
-    #
-    #     ##----- Création du canevas et affichage de l'image -----##
-    #     dessin = tk.Canvas(btm, width=im.size[0], height=im.size[1])
-    #     logo1 = dessin.create_image(0, 0, anchor=tk.NW, image=logo)
-    #     dessin.grid()
-    #     lan = ctk.CTkButton(btm, text='Lancer', command=self.make_frame)
-    #     lan.pack(side=ctk.BOTTOM)
 
     def make_frame(self):
         """
@@ -457,8 +440,8 @@ class Application(ctk.CTk):
             self.scroll_left.add_img((self.w_past, self.h_past))
             change_temp(list(Application.selected_source["source"].values()))
             Application.new_image()
-            Application.selected_source[
-                "source"] = {}  # TODO resoudre warning Expected type 'dict', got 'Dict[str, Union[str, Any]]' instead
+            Application.selected_source["source"] = {}
+            # TODO resoudre warning Expected type 'dict', got 'Dict[str, Union[str, Any]]' instead
 
     def unselect_all(self):
         """
@@ -473,9 +456,6 @@ class Application(ctk.CTk):
             for c in range(Application.col):
                 self.photo_frame[r][c]['btn'].configure(fg_color="grey")
                 self.photo_frame[r][c]['clicked'] = False
-
-    def valid_choice(self):
-        pass
 
     @classmethod
     def new_image(cls):
@@ -557,48 +537,107 @@ class Application(ctk.CTk):
         fun = False
         self.end()
 
-    def Subselect(self, source):
-        Application.selected_source = {"source": {"selected": source, "all":list(Application.selected_source["source"].values())}}
+    def Subselect(self, coupable):
+        Application.report["end"] = coupable
+        Application.report["history"] = self.get_history()
+        for i in list(Application.selected_source["source"].values()):
+            if i != coupable:
+                Application.report["history"].append(i)
         self.save_coupable()
 
-    def end(self):
-        source_list = list(Application.selected_source["source"].values())
-        if len(source_list) == 0:
-            temp = os.listdir(past_temp)
-            for t in temp:
-                source_list.append(f"{past_temp}{t}")
-            Application.selected_source = {"source": {"selected": source_list[0]}}
-        if len(source_list) > 1:
-            top = tk.Toplevel(self)
-            top.title("SubSelect")
-            for i in source_list:
-                export_image = ctk.CTkButton(top,
-                                             image=ImageTk.PhotoImage(Image.open(i)),
-                                             compound="bottom", command=lambda x=i: self.Subselect(x),
-                                             text="export image", fg_color="darkgrey", hover_color="grey")
-                export_image.pack()
+    def Subselect_top(self, sub_list):
+        top = tk.Toplevel(self)
+        top.title("SubSelect")
+        for i in sub_list:
+            export_image = ctk.CTkButton(top,
+                                         image=ImageTk.PhotoImage(Image.open(i)),
+                                         compound="bottom", command=lambda x=i: self.Subselect(x),
+                                         text="export image", fg_color="darkgrey", hover_color="grey")
+            export_image.pack()
+        """
+        Application.selected_source = {
+            "source": {"selected": source, "all": list(Application.selected_source["source"].values())}}
+        self.save_coupable()
+        """
 
+    def get_history(self):
+        h = []
+        for d in range(1, len(os.listdir(last_path)) + 1):
+            for i in os.listdir(f"{last_path}{d}"):
+                h.append(f"{last_path}{d}/{i}")
+        return h
+
+    def end_in(self, source):
+        print("selection in ")
+        print(source)
+        if len(source) > 1:
+            print("more than 1")
+            self.Subselect_top(source)
         else:
-            if fun:
-                self.end_gif()
-            else:
-                # ajouter verif de si ca vous va
-                f = list(Application.selected_source["source"].values())[0]
-                Application.selected_source = {
-                    "source": {"selected": f, "all":f}}
+            Application.report["end"] = source
+            Application.report["history"] = self.get_history()
+            self.save_coupable()
 
-                self.toplevel = tk.Toplevel(self)
-                self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
-                self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
-                export_image = ctk.CTkButton(self.toplevel,
-                                             image=ImageTk.PhotoImage(Image.open(source_list[0])),
-                                             compound="bottom", command=lambda: self.save_coupable(),
-                                             text="export image", fg_color="darkgrey", hover_color="grey")
-                export_image.grid(row=0, column=0, sticky="nsew")
+    def end_out(self):
+        print("history selection")
+        past_path = os.listdir(past_temp)
+        if len(past_path) > 1:
+            temp = []
+            for f in past_path:
+                temp.append(f"{past_temp}{f}")
+            self.Subselect_top(temp)
+        else:
+            Application.report["end"] = past_path[0]
+            Application.report["history"] = self.get_history()
+
+    def get_coupable_list(self):
+        coupable_list = list(Application.selected_source["source"].values())
+        return coupable_list
+
+    def end(self):
+        source_list = self.get_coupable_list()
+        # TODO cas selection parmis 6 --> cas A = selection 1 image , cas B = selection + 1 image
+        if len(source_list) == 0:  # cas pas dans les 6
+            self.end_out()
+        else:
+            self.end_in(source_list)
+        # TODO cas valid ancienne proposition --> cas A = que une image, cas B = thumbnail
 
     def save_coupable(self):
-        export_pdf(self.value, True)
+        hist_ = Application.report["history"]
+        coupable_ = Application.report["end"]
+        rem = tk.Toplevel(self)
+        rem.title("Remarques")
+        rem.update()
+        rem.geometry("+%d+%d" % ((self.winfo_screenwidth() // 2) - (rem.winfo_width() // 2),
+                                 (self.winfo_screenheight() // 2) - (rem.winfo_height() // 2)))
+        rem.grid_columnconfigure(0, weight=1, uniform="group1")
+        rem.grid_rowconfigure(0, weight=1, uniform="group1")
+        rem.grid_rowconfigure(1, weight=1, uniform="group1")
+        self.remarque_txt = ctk.CTkEntry(rem, placeholder_text="remarque coupable")
+        self.remarque_txt.grid(row=0, column=0, sticky="nsew")
+        val_btn = ctk.CTkButton(rem, text="Validation",
+                                command=lambda h=hist_, c=coupable_, b=True: self.call_export(h, c, b))
+        val_btn.grid(row=1, column=0)
 
+    def call_export(self, h, c, b):
+        txt = self.remarque_txt.get().split() #25 max
+        new_txt = ""
+        longeur = 0
+        for l in txt:
+            ll = len(l)
+            if longeur+ll >= 25 :
+                new_txt += "\n"
+                new_txt += l
+                longeur = ll
+            else:
+                new_txt += l
+                longeur+=ll
+            print(new_txt)
+
+
+        self.value["remarque_photo"] = new_txt
+        export_pdf(self.value, h,c,b)
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
     if not os.path.exists(dir_path):

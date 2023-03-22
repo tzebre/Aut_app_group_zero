@@ -25,7 +25,7 @@ def main(value, path="etst.png", dest = "report.pdf"):
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=A4)
     for k in start:
-        can.drawString(start[k][0], start[k][1], value[k])
+        can.drawString(start[k][0], start[k][1],value[k] )
     can.drawInlineImage(path[1], 211, 842 - 567, height=365, width=365)
     can.drawInlineImage(path[0], 213, 842 - 803, height=170, width=170)
     can.drawInlineImage(path[2], 515, 842 - (6+70), height=70, width=70)
