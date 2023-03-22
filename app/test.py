@@ -17,8 +17,7 @@ from math import ceil, sqrt
 from datetime import datetime
 import json
 from tkinter.filedialog import asksaveasfile
-
-# TODO si validation finale avant le premier next = BUG
+#TODO mieux gerer les cas ou mutiselection sans next (declancher un next pas encore eu dans le cas ou validation finale avant ?)
 img_path = "00000/"
 last_path = ".past/"
 muted_path = ".img/"
@@ -42,11 +41,15 @@ def export_pdf(value, json_):
     id = value["rapport"]
     pdf_exp.make_qr(id)
     list_img = []
-    for dir_i in range(1,len(os.listdir(last_path))+1):
-        for i in os.listdir(f"{last_path}{dir_i}/"):
-            list_img.append(f"{last_path}{dir_i}/{i}")
+    if len(os.listdir(last_path)) !=0:
+        for dir_i in range(1,len(os.listdir(last_path))+1):
+            for i in os.listdir(f"{last_path}{dir_i}/"):
+                list_img.append(f"{last_path}{dir_i}/{i}")
+        end_img = list(Application.selected_source["source"].values())[0]
+    else:
+        list_img = Application.selected_source["source"]["all"]
+        end_img = Application.selected_source["source"]["selected"]
     hist_img = Make_thumbnail(list_img, 255)
-    end_img = list(Application.selected_source["source"].values())[0]
     path = [end_img,hist_img, "qr_code.png"]
     if json_:
         file_json = asksaveasfile(filetypes=[('json Files', '*.json')])
@@ -554,7 +557,7 @@ class Application(ctk.CTk):
         self.end()
 
     def Subselect(self, source):
-        Application.selected_source = {"source": {"selected": source}}
+        Application.selected_source = {"source": {"selected": source, "all":list(Application.selected_source["source"].values())}}
         self.save_coupable()
 
     def end(self):
