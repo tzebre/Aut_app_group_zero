@@ -31,10 +31,6 @@ W = 64  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
 
 
-def get_all_hist_path():
-    return []
-
-
 def rdm_le(x, bool):
     if bool:
         return random.choice(string.ascii_uppercase)[:x]
