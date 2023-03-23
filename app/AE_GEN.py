@@ -22,9 +22,9 @@ tf.random.set_seed(42)
 H = 64
 W = 64
 C = 3
-encoder = tf.keras.models.load_model('../saved_model/encoder.tf', compile=False)
+encoder = tf.keras.models.load_model('encoder.tf', compile=False)
 # encoder.summary()
-decoder = tf.keras.models.load_model('../saved_model/decoder.tf', compile=False)
+decoder = tf.keras.models.load_model('decoder.tf', compile=False)
 # decoder.summary()
 
 encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
