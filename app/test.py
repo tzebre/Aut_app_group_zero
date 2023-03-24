@@ -54,6 +54,10 @@ def export_pdf(value, hist_list, end_path, json_):
         with open(file_json.name, 'w') as outfile:
             outfile.write(json.dumps(value))
     file_pdf = asksaveasfile(filetypes=[('pdf Files', '*.pdf')])
+    for i,p in enumerate(path):
+        if isinstance(p, list):
+            path[i] = p[0]
+    print(path)
     pdf_exp.main(value, path, file_pdf.name)
     app.quit()
 
@@ -583,8 +587,9 @@ class Application(ctk.CTk):
                 temp.append(f"{past_temp}{f}")
             self.Subselect_top(temp)
         else:
-            Application.report["end"] = past_path[0]
+            Application.report["end"] = F"{past_temp}{past_path[0]}"
             Application.report["history"] = self.get_history()
+            self.save_coupable()
 
     def get_coupable_list(self):
         coupable_list = list(Application.selected_source["source"].values())
