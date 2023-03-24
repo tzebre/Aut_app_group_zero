@@ -54,6 +54,10 @@ def export_pdf(value, hist_list, end_path, json_):
         with open(file_json.name, 'w') as outfile:
             outfile.write(json.dumps(value))
     file_pdf = asksaveasfile(filetypes=[('pdf Files', '*.pdf')])
+    for i,p in enumerate(path):
+        if isinstance(p, list):
+            path[i] = p[0]
+    print(path)
     pdf_exp.main(value, path, file_pdf.name)
     app.quit()
 
@@ -570,8 +574,9 @@ class Application(ctk.CTk):
             print("more than 1")
             self.Subselect_top(source)
         else:
+            print("chemou")
             Application.report["end"] = source
-            Application.report["history"] = self.get_history()
+            Application.report["history"] = source # peut etre mettre aucune ?
             self.save_coupable()
 
     def end_out(self):
@@ -583,8 +588,9 @@ class Application(ctk.CTk):
                 temp.append(f"{past_temp}{f}")
             self.Subselect_top(temp)
         else:
-            Application.report["end"] = past_path[0]
+            Application.report["end"] = F"{past_temp}{past_path[0]}"
             Application.report["history"] = self.get_history()
+            self.save_coupable()
 
     def get_coupable_list(self):
         coupable_list = list(Application.selected_source["source"].values())
@@ -608,30 +614,29 @@ class Application(ctk.CTk):
         rem.geometry("+%d+%d" % ((self.winfo_screenwidth() // 2) - (rem.winfo_width() // 2),
                                  (self.winfo_screenheight() // 2) - (rem.winfo_height() // 2)))
         rem.grid_columnconfigure(0, weight=1, uniform="group1")
-        rem.grid_rowconfigure(0, weight=1, uniform="group1")
-        rem.grid_rowconfigure(1, weight=1, uniform="group1")
-        self.remarque_txt = ctk.CTkEntry(rem, placeholder_text="remarque coupable")
+        rem.grid_rowconfigure(0, weight=1)
+        rem.grid_rowconfigure(1, weight=1)
+        self.remarque_txt = tk.Text(rem)
         self.remarque_txt.grid(row=0, column=0, sticky="nsew")
         val_btn = ctk.CTkButton(rem, text="Validation",
                                 command=lambda h=hist_, c=coupable_, b=True: self.call_export(h, c, b))
         val_btn.grid(row=1, column=0)
 
     def call_export(self, h, c, b):
-        txt = self.remarque_txt.get().split() #25 max
-        new_txt = ""
-        longeur = 0
+        txt = self.remarque_txt.get("1.0","end-1c").split()
+        new_txt = []
+        line = ""
+        line_count = 0
         for l in txt:
+            longeur = len(line)
             ll = len(l)
-            if longeur+ll >= 25 :
-                new_txt += "\n"
-                new_txt += l
-                longeur = ll
+            if longeur + ll >= 25:
+                new_txt.append(line)
+                line_count +=1
+                line = l
             else:
-                new_txt += l
-                longeur+=ll
-            print(new_txt)
-
-
+                line += l
+        print(new_txt)
         self.value["remarque_photo"] = new_txt
         export_pdf(self.value, h,c,b)
 
