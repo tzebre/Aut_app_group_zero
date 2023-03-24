@@ -574,6 +574,7 @@ class Application(ctk.CTk):
             print("more than 1")
             self.Subselect_top(source)
         else:
+            print("chemou")
             Application.report["end"] = source
             Application.report["history"] = source # peut etre mettre aucune ?
             self.save_coupable()
