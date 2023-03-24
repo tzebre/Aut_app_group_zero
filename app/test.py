@@ -631,7 +631,7 @@ class Application(ctk.CTk):
             longeur = len(line)
             ll = len(l)
             if longeur + ll >= 25:
-                new_txt.append(line)
+                new_txt.append(f" {line}")
                 line_count +=1
                 line = l
             else:
