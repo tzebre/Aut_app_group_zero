@@ -18,7 +18,7 @@ from datetime import datetime
 import json
 from tkinter.filedialog import asksaveasfile
 
-# TODO mieux gerer les cas ou mutiselection sans next (declancher un next pas encore eu dans le cas ou validation finale avant ?)
+# TODO validation finale a une seul image = bug
 img_path = "00000/"
 last_path = ".past/"
 muted_path = ".img/"
@@ -631,7 +631,7 @@ class Application(ctk.CTk):
             longeur = len(line)
             ll = len(l)
             if longeur + ll >= 25:
-                new_txt.append(f" {line}")
+                new_txt.append(line)
                 line_count +=1
                 line = l
             else:
