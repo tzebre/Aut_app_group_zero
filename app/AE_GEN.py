@@ -167,7 +167,6 @@ def save_modified_img(pop):
     Agrs:
         pop (float[]): liste d'images decodées.
     '''
-  
     if not os.path.exists('.img'):
         os.makedirs('.img')
     else:
