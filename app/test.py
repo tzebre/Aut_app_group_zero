@@ -473,7 +473,7 @@ class Application(ctk.CTk):
         cls.unselect_all(cls)
         if Application.never:
             for i in range(1, 6):
-                shutil.copyfile(f"{img_path}0000{i}.png", f"{muted_path}0000{i}.png")
+                shutil.copyfile(random_img(img_path), f"{muted_path}0000{i}.png")
             source = created_img(False)
             Application.never = False
         else:
