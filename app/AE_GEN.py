@@ -30,6 +30,18 @@ decoder = tf.keras.models.load_model('decoder_128.tf', compile=False)
 encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
 decoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
 
+def autocode(img, bl=True):
+    img = Image.open(img)
+    if bl:
+        t = 128
+        img = img.resize((t, t))
+        array_img = np.array([np.array(img)/255])
+        img = encoder.predict(array_img)
+        img = decoder.predict(img)
+        img = Image.fromarray(np.uint8(img[0] * 255))
+    path = f".cache/autocode.png"
+    img.save(path)
+    return path
 
 def implement_img():
     """Récupère les images sélectionnées et les encode

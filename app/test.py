@@ -137,7 +137,7 @@ def random_img(dir_choice=img_path):
     return random_image
 
 
-def created_img():
+def created_img(bl = True):
     """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
     2 ligne 3 colonnes
 
@@ -147,7 +147,9 @@ def created_img():
     files = os.listdir(muted_path)
     for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
-    files.append(random_img())
+    path = random_img()
+    autocoded = ae.autocode(path, bl)
+    files.append(autocoded)
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
     return img_lst
@@ -472,25 +474,17 @@ class Application(ctk.CTk):
         if Application.never:
             for i in range(1, 6):
                 shutil.copyfile(f"{img_path}0000{i}.png", f"{muted_path}0000{i}.png")
+            source = created_img(False)
+            Application.never = False
         else:
             ae.main_genetic_algorithm()
-        Application.never = False
-        if Application.never:
-            for r in range(Application.row):
-                for c in range(Application.col):
-                    source = random_img()
-                    Application.photo_frame[r][c]['source'] = source
-                    Application.photo_frame[r][c]['btn'].configure(
-                        image=convert_photoimg(source, Application.size_photo),
-                        compound='top')
-        else:
             source = created_img()
-            for r in range(Application.row):
-                for c in range(Application.col):
-                    Application.photo_frame[r][c]['source'] = source[r - 1][c - 1]
-                    Application.photo_frame[r][c]['btn'].configure(
-                        image=convert_photoimg(source[r - 1][c - 1], Application.size_photo),
-                        compound='top')
+        for r in range(Application.row):
+            for c in range(Application.col):
+                Application.photo_frame[r][c]['source'] = source[r - 1][c - 1]
+                Application.photo_frame[r][c]['btn'].configure(
+                    image=convert_photoimg(source[r - 1][c - 1], Application.size_photo),
+                    compound='top')
 
     def end_gif(self):
         self.toplevel = tk.Toplevel(self)
