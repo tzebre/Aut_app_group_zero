@@ -26,8 +26,8 @@ past_temp = ".past_temp/"
 dir_cache = ".cache/"
 fun = False  # Fun mode
 
-H = 64  # Hauteur des images
-W = 64  # Largeur des images
+H = 128  # Hauteur des images
+W = 128  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
 
 
