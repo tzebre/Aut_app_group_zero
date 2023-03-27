@@ -23,15 +23,18 @@ img_path = ".data/00000/"
 H = 128
 W = 128
 C = 3
-encoder = tf.keras.models.load_model('model/encoder_128.tf', compile=False)
-# encoder.summary()
-decoder = tf.keras.models.load_model('model/decoder_128.tf', compile=False)
-# decoder.summary()
 
-encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
-decoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
+def main_autocodeur():
+    encoder = tf.keras.models.load_model('model/encoder_128.tf', compile=False)
+    # encoder.summary()
+    decoder = tf.keras.models.load_model('model/decoder_128.tf', compile=False)
+    # decoder.summary()
 
-def autocode(img, bl=True):
+    encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
+    decoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
+    return encoder, decoder
+
+def autocode(img, encoder, decoder, bl=True):
     img = Image.open(img)
     if bl:
         t = 128
@@ -44,7 +47,7 @@ def autocode(img, bl=True):
     img.save(path)
     return path
 
-def implement_img():
+def implement_img(encoder):
     """Récupère les images sélectionnées et les encode
     Returns:
         list_img (float[]): liste d'images encodées sous forme de vecteur de taille 128.
@@ -85,37 +88,38 @@ def generate_initial_pop(list_img, N):
         initial_pop : population intiale qui va être utilisée par l’algorithme génétique
 
     """
-  
-    pop = []
-    val_proba = (1,1,1)
-    if N == 1 :
-        for i in (0,0,0,0,0) :
-            pop.append(list_img[0])
-            val_proba = (0.3, 1, 0.6)
-    elif N == 2 :
-        for i in (0,0,0,1,1):
-            pop.append(list_img[i])
-            val_proba = (0.3, 0.9, 0.6)
-    elif N == 3 :
-        for i in (0,0,1,1,2):
-            pop.append(list_img[i])
-            val_proba = (0.3, 0.8, 0.7)
-    elif N == 4 :
-        for i in (0,0,1,2,3):
-            pop.append(list_img[i])
-            val_proba = (0.3, 0.6, 0.7)
-    elif N == 5 :
-        for i in (0,1,2,3,4):
-            pop.append(list_img[i])
-            val_proba = (0.2, 0.6, 0.8)
 
-    initial_pop = (np.array(pop),val_proba)
+    res = []
+    # val contient la probabilité de mutation, a valeur de epsilon et la probabilité de crossing over
+    val = (1, 1, 1)
+    if N == 1:
+        for i in (0, 0, 0, 0, 0):
+            res.append(list_img[0])
+            val = (0.8, 45, 0.1)
+    elif N == 2:
+        for i in (0, 0, 0, 1, 1):
+            res.append(list_img[i])
+            val = (0.5, 40, 0.3)
+    elif N == 3:
+        for i in (0, 0, 1, 1, 2):
+            res.append(list_img[i])
+            val = (0.3, 35, 0.5)
+    elif N == 4:
+        for i in (0, 0, 1, 2, 3):
+            res.append(list_img[i])
+            val = (0.2, 35, 0.65)
+    elif N == 5:
+        for i in (0, 1, 2, 3, 4):
+            res.append(list_img[i])
+            val = (0.2, 35, 0.7)
+
+    initial_pop = (np.array(res),val)
 
     return initial_pop
 
 
 def mutation(data_encoded,proba,ratio=1):
-    '''Partie de l'algorithme génétique qui va permettre de réaliser des SNP aléatoirement 
+    '''Partie de l'algorithme génétique qui va permettre de réaliser des SNP aléatoirement
 
     Args :
         data_encoded (float[]): liste d'images encodées sous forme de vecteur de taille 128.
@@ -139,7 +143,7 @@ def mutation(data_encoded,proba,ratio=1):
 
                 if random_value < 0.5:
                     list_img[i,j] = ratio * 1 * sigma * np.random.random() + moyenne
-              
+
                 else:
                     list_img[i,j] = ratio * -1 * sigma * np.random.random() + moyenne
 
@@ -147,7 +151,7 @@ def mutation(data_encoded,proba,ratio=1):
 
 
 def crossing_over(data_encoded, Tc):
-    '''Partie de l'algorithme génétique qui va permettre de réaliser des crossing over 
+    '''Partie de l'algorithme génétique qui va permettre de réaliser des crossing over
 
     Args :
         data_encoded (float[]): liste d'images encodées sous forme de vecteur de taille 128.
@@ -158,18 +162,18 @@ def crossing_over(data_encoded, Tc):
     '''
 
     list_img = np.copy(data_encoded)
-  
+
     for i in range(0,len(list_img)):
         if random() < Tc:
-            random_indiv = randint(0, list_img.shape[0]-1) 
+            random_indiv = randint(0, list_img.shape[0]-1)
             while random_indiv == i:
                 random_indiv = randint(0, list_img.shape[0]-1)
 
-            position_cross = randint(0, list_img.shape[1]-1) 
-         
-            tmp = np.copy(list_img[i,position_cross:list_img.shape[1]]) 
-            list_img[i,position_cross:list_img.shape[1]] = np.copy(list_img[random_indiv,position_cross:list_img.shape[1]]) 
-            list_img[random_indiv,position_cross:list_img.shape[1]] = tmp 
+            position_cross = randint(0, list_img.shape[1]-1)
+
+            tmp = np.copy(list_img[i,position_cross:list_img.shape[1]])
+            list_img[i,position_cross:list_img.shape[1]] = np.copy(list_img[random_indiv,position_cross:list_img.shape[1]])
+            list_img[random_indiv,position_cross:list_img.shape[1]] = tmp
 
     return list_img
 
@@ -195,14 +199,14 @@ def save_modified_img(pop):
         plt.clf()
 
 
-def main_genetic_algorithm():
+def main_genetic_algorithm(encoder, decoder):
     '''Effectue la modification des images en utlisant un algorithme génétique
 
     Encode les images sélectionnées par l'utilisateur et va générer une population avec des probabilités qui lui sont propres.
     Modifie celle-ci au travers de mutation et de crossing over afin de générer une nouvelle population.
     Decode les images et les enregistre dans un dossier pour être lu par l'interface graphique.
     '''
-    images=implement_img()
+    images=implement_img(encoder)
 
     nb_images = len(images)
     if nb_images == 64 :
@@ -213,9 +217,12 @@ def main_genetic_algorithm():
 
     proba_mut, ratio, proba_cross = val
 
-    pop=mutation(pop,proba_mut,ratio) 
+    pop=mutation(pop,proba_mut,ratio)
     pop=crossing_over(pop,proba_cross)
 
     pop=decoder.predict(pop)
 
     save_modified_img(pop)
+
+if __name__ == '__main__':
+    _, _ = main_autocodeur()

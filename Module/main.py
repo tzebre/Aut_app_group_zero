@@ -6,7 +6,7 @@ from itertools import count, cycle
 import shutil
 import os
 from PIL import Image
-from AE_GEN import autocode, main_genetic_algorithm
+from AE_GEN import autocode, main_genetic_algorithm, main_autocodeur
 import numpy as np
 from pdf import main_pdf, make_qr
 import uuid
@@ -167,7 +167,7 @@ def created_img(bl=True):
     for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
     path = random_img()
-    autocoded = autocode(path, bl)
+    autocoded = autocode(path,encoder, decoder, bl)
     files.append(autocoded)
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
@@ -574,7 +574,7 @@ class Application(ctk.CTk):
             source = created_img(False)
             Application.never = False
         else:
-            main_genetic_algorithm()
+            main_genetic_algorithm(encoder, decoder)
             source = created_img()
         for r in range(Application.row):
             for c in range(Application.col):
@@ -798,9 +798,13 @@ for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
 
-app = Application()
-# Load the image file from disk.
-icon = tk.PhotoImage(file=".source/logo.png")
-# Set it as the window icon.
-app.iconphoto(True, icon)
-app.mainloop()
+if __name__ == '__main__':
+    global encoder
+    global decoder
+    encoder , decoder = main_autocodeur()
+    app = Application()
+    # Load the image file from disk.
+    icon = tk.PhotoImage(file=".source/logo.png")
+    # Set it as the window icon.
+    app.iconphoto(True, icon)
+    app.mainloop()
