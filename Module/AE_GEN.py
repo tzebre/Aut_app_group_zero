@@ -89,31 +89,30 @@ def generate_initial_pop(list_img, N):
 
     """
 
-    res = []
-    # val contient la probabilité de mutation, a valeur de epsilon et la probabilité de crossing over
-    val = (1, 1, 1)
+    pop = []
+    val_proba = (1, 1, 1)
     if N == 1:
         for i in (0, 0, 0, 0, 0):
-            res.append(list_img[0])
-            val = (0.8, 45, 0.1)
+            pop.append(list_img[0])
+            val_proba = (0.3, 1, 0.6)
     elif N == 2:
         for i in (0, 0, 0, 1, 1):
-            res.append(list_img[i])
-            val = (0.5, 40, 0.3)
+            pop.append(list_img[i])
+            val_proba = (0.3, 0.9, 0.6)
     elif N == 3:
         for i in (0, 0, 1, 1, 2):
-            res.append(list_img[i])
-            val = (0.3, 35, 0.5)
+            pop.append(list_img[i])
+            val_proba = (0.3, 0.8, 0.7)
     elif N == 4:
         for i in (0, 0, 1, 2, 3):
-            res.append(list_img[i])
-            val = (0.2, 35, 0.65)
+            pop.append(list_img[i])
+            val_proba = (0.3, 0.6, 0.7)
     elif N == 5:
         for i in (0, 1, 2, 3, 4):
-            res.append(list_img[i])
-            val = (0.2, 35, 0.7)
+            pop.append(list_img[i])
+            val_proba = (0.2, 0.6, 0.8)
 
-    initial_pop = (np.array(res),val)
+    initial_pop = (np.array(pop), val_proba)
 
     return initial_pop
 
