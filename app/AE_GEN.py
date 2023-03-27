@@ -18,13 +18,14 @@ from random import *
 ## Seeding
 np.random.seed(42)
 tf.random.set_seed(42)
+img_path = ".data/00000/"
 
 H = 128
 W = 128
 C = 3
-encoder = tf.keras.models.load_model('encoder_128.tf', compile=False)
+encoder = tf.keras.models.load_model('model/encoder_128.tf', compile=False)
 # encoder.summary()
-decoder = tf.keras.models.load_model('decoder_128.tf', compile=False)
+decoder = tf.keras.models.load_model('model/decoder_128.tf', compile=False)
 # decoder.summary()
 
 encoder.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
@@ -59,9 +60,9 @@ def implement_img():
                 img = img.resize((t, t))
                 list_img.append(np.array(img) / 255)
     else:
-        for file in os.listdir(f"00000/"):
+        for file in os.listdir(f"{img_path}"):
             if file != ".DS_Store":
-                img = Image.open(f"00000/{file}")
+                img = Image.open(f"{img_path}{file}")
                 t = 128
                 img = img.resize((t, t))
                 list_img.append(np.array(img) / 255)

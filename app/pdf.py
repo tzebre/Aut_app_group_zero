@@ -2,18 +2,8 @@ from PyPDF2 import PdfWriter, PdfReader
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from datetime import datetime
-import uuid
-import random
-import string
 import qrcode
 
-
-def rdm_le(x, bool):
-    if bool:
-        return random.choice(string.ascii_uppercase)[:x]
-    else:
-        return random.choice(string.ascii_lowercase)[:x]
 
 
 start = {"rapport": (84, 842 - 218), "date": (48, 842 - 237), "auteur": (10, 842 - (279 + 17)),
@@ -21,7 +11,7 @@ start = {"rapport": (84, 842 - 218), "date": (48, 842 - 237), "auteur": (10, 842
          "remarque_photo": (401, 842 - 660)}
 
 
-def main(value, path="etst.png", dest = "report.pdf"):
+def main_pdf(value, path, dest = "report.pdf"):
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=A4)
     for k in start:

@@ -6,9 +6,9 @@ from itertools import count, cycle
 import shutil
 import os
 from PIL import Image
-import AE_GEN as ae
+from AE_GEN import autocode, main_genetic_algorithm
 import numpy as np
-import pdf as pdf_exp
+from pdf import main_pdf, make_qr
 import uuid
 import random
 import string
@@ -17,7 +17,7 @@ from datetime import datetime
 import json
 from tkinter.filedialog import asksaveasfile
 
-img_path = "00000/"
+img_path = ".data/00000/"
 last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
@@ -60,7 +60,7 @@ def export_pdf(value, hist_list, end_path, json_):
             None
     """
     id = value["rapport"]
-    pdf_exp.make_qr(id)
+    make_qr(id)
     hist_img = Make_thumbnail(hist_list, 255)
     path = [end_path, hist_img, "qr_code.png"]
     if json_:
@@ -76,8 +76,7 @@ def export_pdf(value, hist_list, end_path, json_):
     for i, p in enumerate(path):
         if isinstance(p, list):
             path[i] = p[0]
-    print(path)
-    pdf_exp.main(value, path, file_pdf.name)
+    main_pdf(value, path, file_pdf.name)
     app.quit()
 
 
@@ -168,7 +167,7 @@ def created_img(bl=True):
     for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
     path = random_img()
-    autocoded = ae.autocode(path, bl)
+    autocoded = autocode(path, bl)
     files.append(autocoded)
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
@@ -575,7 +574,7 @@ class Application(ctk.CTk):
             source = created_img(False)
             Application.never = False
         else:
-            ae.main_genetic_algorithm()
+            main_genetic_algorithm()
             source = created_img()
         for r in range(Application.row):
             for c in range(Application.col):
@@ -596,11 +595,11 @@ class Application(ctk.CTk):
         self.toplevel = tk.Toplevel(self)
         self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
         self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
-        self.gif_frame = ctk.CTkButton(self.toplevel, image=convert_photoimg("gif/output_0.png", None),
+        self.gif_frame = ctk.CTkButton(self.toplevel, image=convert_photoimg(".data/gif/output_0.png", None),
                                        compound="bottom",
                                        text="next", command=self.end_anim, fg_color="darkgrey", hover_color="grey")
         self.gif_frame.grid(row=0, column=0)
-        im = "gif/police-dance.gif"
+        im = ".data/gif/police-dance.gif"
         if isinstance(im, str):
             im = Image.open(im)
         frames = []
@@ -696,7 +695,6 @@ class Application(ctk.CTk):
                  None
             """
         if len(source) > 1:
-            print("more than 1")
             self.Subselect_top(source)
         else:
             Application.report["end"] = source
@@ -729,11 +727,14 @@ class Application(ctk.CTk):
             Returns:
                  None
             """
-        source_list = get_coupable_list()
-        if len(source_list) == 0:  # cas pas dans les 6
-            self.end_out()
+        if fun:
+            self.end_gif()
         else:
-            self.end_in(source_list)
+            source_list = get_coupable_list()
+            if len(source_list) == 0:  # cas pas dans les 6
+                self.end_out()
+            else:
+                self.end_in(source_list)
 
     def save_coupable(self):
         """
