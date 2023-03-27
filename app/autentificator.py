@@ -12,13 +12,11 @@ import pdf as pdf_exp
 import uuid
 import random
 import string
-from numpy import asarray
 from math import ceil, sqrt
 from datetime import datetime
 import json
 from tkinter.filedialog import asksaveasfile
 
-# TODO validation finale a une seul image = bug
 img_path = "00000/"
 last_path = ".past/"
 muted_path = ".img/"
@@ -31,15 +29,36 @@ W = 128  # Largeur des images
 C = 3  # 3 si RGB 1 si N&B
 
 
-def rdm_le(x, bool):
-    if bool:
+def rdm_le(x: int, majuscule: bool) -> str:
+    """
+        Génère une chaîne de caractères aléatoire de longueur x en utilisant des lettres majuscules ou minuscules.
+
+        Args:
+            x (int): Longueur de la chaîne de caractères à générer.
+            majuscule (bool): Si True, les lettres générées sont en majuscules. Sinon, elles sont en minuscules.
+
+        Returns :
+            str : La chaîne de caractères générée.
+        """
+    if majuscule:
         return random.choice(string.ascii_uppercase)[:x]
     else:
         return random.choice(string.ascii_lowercase)[:x]
 
 
 def export_pdf(value, hist_list, end_path, json_):
-    # TODO give path_hist et path_end
+    """
+        Exporte les données du dictionnaire `value` sous forme de fichier PDF.
+
+        Args:
+            value (dict): Dictionnaire contenant les données à exporter sous forme de PDF.
+            hist_list (list) : Liste d'images à inclure dans le PDF.
+            end_path (str) : Chemin de destination pour les fichiers exportés.
+            json_ (bool): Si `True`, les données sont également sauvegardées sous forme de fichier JSON.
+
+        Returns:
+            None
+    """
     id = value["rapport"]
     pdf_exp.make_qr(id)
     hist_img = Make_thumbnail(hist_list, 255)
@@ -54,7 +73,7 @@ def export_pdf(value, hist_list, end_path, json_):
         with open(file_json.name, 'w') as outfile:
             outfile.write(json.dumps(value))
     file_pdf = asksaveasfile(filetypes=[('pdf Files', '*.pdf')])
-    for i,p in enumerate(path):
+    for i, p in enumerate(path):
         if isinstance(p, list):
             path[i] = p[0]
     print(path)
@@ -68,6 +87,7 @@ def Make_thumbnail(list_img, color=0):
 
     Args:
         list_img (list): Une liste d'images à utiliser pour créer la miniature.
+        color (int): valeur des pixels par défauts
 
     Returns:
         str: Le chemin du fichier "thumbnailed.png" créé.
@@ -81,7 +101,7 @@ def Make_thumbnail(list_img, color=0):
     r = 0
     collage = Image.new('RGB', (W * x, H * x), color=(color, color, color))
     for i in list_img:
-        if c == (x):
+        if c == x:
             c = 0
             r += 1
         collage.paste(Image.open(i).resize((H, W)), (W * c, H * r))
@@ -137,7 +157,7 @@ def random_img(dir_choice=img_path):
     return random_image
 
 
-def created_img(bl = True):
+def created_img(bl=True):
     """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
     2 ligne 3 colonnes
 
@@ -192,6 +212,18 @@ def convert_photoimg(source, size):
 
 
 class Pastchoice(ctk.CTkScrollableFrame):
+    """Classe qui représente la liste des choix de photos passés de l'application.
+
+        Hérite de ctk.CTkScrollableFrame.
+
+        Attributs :
+            count (int) : Le nombre de générations précédentes.
+            all_past (dict) : Un dictionnaire contenant tous les boutons d'images précédents et leurs chemins associés.
+
+        Méthodes :
+            add_img : Ajoute une image à l'interface graphique sous forme de bouton avec un texte et un compteur.
+            go_past : Efface tous les boutons d'images qui se trouvent après le bouton sélectionné.
+    """
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.count = 0  # Nombre de generation précédentes
@@ -248,7 +280,51 @@ class Pastchoice(ctk.CTkScrollableFrame):
         Application.new_image()
 
 
+def get_history():
+    """
+    Récupère la liste complète de l'historique des sources stockées dans le dossier last_path.
+
+    Returns:
+        h list : Une liste des chemins d'accès complets à tous les fichiers d'historique.
+    """
+    h = []
+    for d in range(1, len(os.listdir(last_path)) + 1):
+        for i in os.listdir(f"{last_path}{d}"):
+            h.append(f"{last_path}{d}/{i}")
+    return h
+
+
+def get_coupable_list():
+    """
+    Récupère la liste des coupables sélectionnés dans l'application.
+
+    Returns:
+        coupable_list (list) : La liste des coupables sélectionnés.
+    """
+    coupable_list = list(Application.selected_source["source"].values())
+    return coupable_list
+
+
 class Application(ctk.CTk):
+    """Classe principale de l'application qui étend la boîte à outils graphique ctk.CTk.
+
+        Attributs :
+            size_photo (None) : La taille de la photo à générer.
+            selected_source (dict) : La source sélectionnée pour la photo, contenant une miniature et une source.
+            report (dict) : Le rapport d'utilisation de l'application, contenant un historique et une date de fin.
+            never (True) : Indique si une génération d'image a déjà eu lieu.
+            col (3) : Le nombre de colonnes dans le cadre de la photo.
+            row (2) : Le nombre de lignes dans le cadre de la photo.
+            photo_frame (dict) : Un dictionnaire représentant le cadre de la photo,
+                                    initialisé avec des valeurs par défaut.
+
+        Méthodes :
+            __init__ : Initialise une nouvelle instance de l'application avec des valeurs par défaut.
+            info : Affiche les informations de l'application.
+            make_frame : Crée le cadre de la photo.
+            enter_info : Permet à l'utilisateur d'entrer des informations pour le rapport
+                            d'utilisation de l'application.
+        """
     size_photo = None
     selected_source = {"thumbnail": "", "source": {}}
     report = {"history": [], "end": ""}
@@ -269,6 +345,7 @@ class Application(ctk.CTk):
         self.end_btn = None
         self.h_past = None
         self.w_past = None
+        self.remarque_txt = None
         self.scroll_left = None
         self.entropy_slider = None
         self.entropy_value = None
@@ -280,6 +357,10 @@ class Application(ctk.CTk):
         self.enter_info()
 
     def enter_info(self):
+        """
+            Affiche une fenêtre Toplevel pour permettre à l'utilisateur de saisir les informations concernant l'auteur,
+            la victime et le numéro d'enquête. Les informations sont saisies dans des Entry.
+            """
         self.withdraw()
         frame_info = tk.Toplevel(self)
         frame_info.title("Enter info")
@@ -309,6 +390,13 @@ class Application(ctk.CTk):
         val_btn.grid(row=3, column=0, columnspan=2)
 
     def start_choice(self):
+        """
+            Récupère les informations sur l'auteur, la victime et l'enquête saisies par l'utilisateur,
+            détruit le widget d'entrée de ces informations et affiche l'interface principale de l'application.
+
+            Returns:
+                None
+            """
         val = ["auteur", "victime", "enquete"]
         for i, e in enumerate(self.info_entry[1:]):
             self.value[val[i]] = str(e.get())
@@ -398,7 +486,7 @@ class Application(ctk.CTk):
                                          command=lambda coords=(r, c): self.button_click(coords), text="_"),
                     'clicked': False, 'order': None, 'source': ""}
                 Application.photo_frame[r][c]['btn'].grid(row=r, column=c, sticky="nsew", padx=padx, pady=pady)
-                # TODO implementer le double click qui declanche unselect_all
+                # TODO implementer le double click qui déclanche unselect_all
                 w, h = get_frame_size(right)
                 w = w // Application.col + 1
                 h = h // Application.row + 1
@@ -427,6 +515,16 @@ class Application(ctk.CTk):
             Application.selected_source["source"][f"{r}_{c}"] = focus_btn["source"]
 
     def next(self):
+        """
+        Déselectionne toutes les images sélectionnées. Si au moins une image était sélectionnée,
+        met le bouton "End" dans l'état "normal", crée une miniature de l'image sélectionnée et ajoute cette miniature
+        à la barre de défilement. Change le dossier actuel en fonction de la ou des images sélectionnées,
+        puis charge une nouvelle image. Réinitialise le dictionnaire "source" à une valeur vide.
+
+
+        Returns:
+            None
+        """
         min_one = False
         for r in self.photo_frame.values():
             for c in r.values():
@@ -487,6 +585,14 @@ class Application(ctk.CTk):
                     compound='top')
 
     def end_gif(self):
+        """
+            Ouvre une fenêtre Toplevel qui affiche un bouton avec le premier frame de la vidéo GIF.
+            Lorsque l'utilisateur clique sur le bouton, le frame suivant est affiché jusqu'à la fin de la vidéo.
+            À la fin de la vidéo, la fenêtre Toplevel est détruite et la méthode end_anim() est appelée.
+
+            Returns:
+                None
+            """
         self.toplevel = tk.Toplevel(self)
         self.toplevel.grid_columnconfigure(0, weight=1, uniform="group1")
         self.toplevel.grid_rowconfigure(0, weight=1, uniform="group1")
@@ -518,11 +624,24 @@ class Application(ctk.CTk):
             self.next_frame()
 
     def next_frame(self):
+        """
+            Affiche la prochaine image de la liste frames et planifie un rappel pour afficher la suivante après un délai
+
+            Returns:
+                 None
+            """
         if self.frames:
             self.gif_frame.configure(image=next(self.frames))
             self.after(self.delay, self.next_frame)
 
     def end_anim(self):
+        """
+            Supprime l'affichage de la fenêtre de sélection et détruit tous les éléments associés.
+            Définit également la variable globale fun à False.
+
+            Returns:
+                 None
+            """
         self.gif_frame.configure(image=None)
         self.frames = None
         self.gif_frame.destroy()
@@ -532,14 +651,31 @@ class Application(ctk.CTk):
         self.end()
 
     def Subselect(self, coupable):
+        """
+           Sélectionne une source spécifique à partir d'une liste de sources et enregistre le choix dans le rapport
+           d'application.
+
+           Args:
+            coupable (str): Le chemin d'accès complet à la source sélectionnée.
+           Returns:
+                None
+           """
         Application.report["end"] = coupable
-        Application.report["history"] = self.get_history()
+        Application.report["history"] = get_history()
         for i in list(Application.selected_source["source"].values()):
             if i != coupable:
                 Application.report["history"].append(i)
         self.save_coupable()
 
     def Subselect_top(self, sub_list):
+        """
+            Affiche une fenêtre de sélection pour une liste de sources.
+
+            Args:
+             sub_list (list) : La liste des chemins d'accès complets des sources sélectionnables.
+            Returns:
+                 None
+            """
         top = tk.Toplevel(self)
         top.title("SubSelect")
         for i in sub_list:
@@ -548,33 +684,32 @@ class Application(ctk.CTk):
                                          compound="bottom", command=lambda x=i: self.Subselect(x),
                                          text="export image", fg_color="darkgrey", hover_color="grey")
             export_image.pack()
-        """
-        Application.selected_source = {
-            "source": {"selected": source, "all": list(Application.selected_source["source"].values())}}
-        self.save_coupable()
-        """
-
-    def get_history(self):
-        h = []
-        for d in range(1, len(os.listdir(last_path)) + 1):
-            for i in os.listdir(f"{last_path}{d}"):
-                h.append(f"{last_path}{d}/{i}")
-        return h
 
     def end_in(self, source):
-        print("selection in ")
-        print(source)
+        """
+            Sélectionne une source si une seule est disponible, sinon appelle la méthode Subselect_top() pour
+            afficher une sous-sélection de sources.
+
+            Args:
+             source (list): Une liste de sources à sélectionner.
+            Returns:
+                 None
+            """
         if len(source) > 1:
             print("more than 1")
             self.Subselect_top(source)
         else:
-            print("chemou")
             Application.report["end"] = source
-            Application.report["history"] = source # peut etre mettre aucune ?
+            Application.report["history"] = source  # peut etre mettre aucune ?
             self.save_coupable()
 
     def end_out(self):
-        print("history selection")
+        """
+        Affiche une sélection d'historiques et enregistre l'historique sélectionné dans le rapport d'application.
+
+        Returns:
+             None
+        """
         past_path = os.listdir(past_temp)
         if len(past_path) > 1:
             temp = []
@@ -583,23 +718,33 @@ class Application(ctk.CTk):
             self.Subselect_top(temp)
         else:
             Application.report["end"] = F"{past_temp}{past_path[0]}"
-            Application.report["history"] = self.get_history()
+            Application.report["history"] = get_history()
             self.save_coupable()
 
-    def get_coupable_list(self):
-        coupable_list = list(Application.selected_source["source"].values())
-        return coupable_list
-
     def end(self):
-        source_list = self.get_coupable_list()
-        # TODO cas selection parmis 6 --> cas A = selection 1 image , cas B = selection + 1 image
+        """
+            Vérifie si des coupables ont été sélectionnés dans les 6 proposé et appelle la méthode end_in() si c'est
+            le cas, sinon appelle la méthode end_out().
+
+            Returns:
+                 None
+            """
+        source_list = get_coupable_list()
         if len(source_list) == 0:  # cas pas dans les 6
             self.end_out()
         else:
             self.end_in(source_list)
-        # TODO cas valid ancienne proposition --> cas A = que une image, cas B = thumbnail
 
     def save_coupable(self):
+        """
+        Fonction qui enregistre le rapport final et ouvre une fenêtre de saisie de remarques.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None
+        """
         hist_ = Application.report["history"]
         coupable_ = Application.report["end"]
         rem = tk.Toplevel(self)
@@ -617,22 +762,33 @@ class Application(ctk.CTk):
         val_btn.grid(row=1, column=0)
 
     def call_export(self, h, c, b):
-        txt = self.remarque_txt.get("1.0","end-1c").split()
+        """
+            Fonction qui prépare les données pour l'export PDF et appelle la fonction d'export.
+
+            Args:
+                h (int): Hauteur de la photo à exporter.
+                c (int): Largeur de la photo à exporter.
+                b (str): Chemin d'accès du fichier de destination pour l'export.
+
+            Returns:
+                None
+            """
+        txt = self.remarque_txt.get("1.0", "end-1c").split()
         new_txt = []
         line = ""
         line_count = 0
-        for l in txt:
+        for word in txt:
             longeur = len(line)
-            ll = len(l)
+            ll = len(word)
             if longeur + ll >= 25:
                 new_txt.append(line)
-                line_count +=1
-                line = l
+                line_count += 1
+                line = word
             else:
-                line += l
-        print(new_txt)
+                line += word
         self.value["remarque_photo"] = new_txt
-        export_pdf(self.value, h,c,b)
+        export_pdf(self.value, h, c, b)
+
 
 for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
     if not os.path.exists(dir_path):
