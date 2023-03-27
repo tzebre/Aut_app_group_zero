@@ -38,25 +38,19 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">Application</span></span><a class="headerlink" href="#main.Application" title="Lien permanent vers cette définition">¶</a></dt>
 <dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">CTk</span></code></p>
 <p>Classe principale de l’application qui étend la boîte à outils graphique ctk.CTk.</p>
-<dl>
+<dl class="simple">
 <dt>Attributs :</dt><dd><p>size_photo (None) : La taille de la photo à générer.
 selected_source (dict) : La source sélectionnée pour la photo, contenant une miniature et une source.
 report (dict) : Le rapport d’utilisation de l’application, contenant un historique et une date de fin.
 never (True) : Indique si une génération d’image a déjà eu lieu.
 col (3) : Le nombre de colonnes dans le cadre de la photo.
 row (2) : Le nombre de lignes dans le cadre de la photo.
-photo_frame (dict) : Un dictionnaire représentant le cadre de la photo,</p>
-<blockquote>
-<div><p>initialisé avec des valeurs par défaut.</p>
-</div></blockquote>
+photo_frame (dict) : Un dictionnaire représentant le cadre de la photo, initialisé avec des valeurs par défaut.</p>
 </dd>
 <dt>Méthodes :</dt><dd><p>__init__ : Initialise une nouvelle instance de l’application avec des valeurs par défaut.
 info : Affiche les informations de l’application.
 make_frame : Crée le cadre de la photo.
-enter_info : Permet à l’utilisateur d’entrer des informations pour le rapport</p>
-<blockquote>
-<div><p>d’utilisation de l’application.</p>
-</div></blockquote>
+enter_info : Permet à l’utilisateur d’entrer des informations pour le rapport d’utilisation de l’application.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -440,7 +434,11 @@ go_past : Efface tous les boutons d’images qui se trouvent après le bouton s�
 <dt class="sig sig-object py" id="main.created_img">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">created_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.created_img" title="Lien permanent vers cette définition">¶</a></dt>
 <dd><p>Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
-2 ligne 3 colonnes</p>
+2 ligne 3 colonnes
+Args :</p>
+<blockquote>
+<div><p>bl (bool): l’image supplementaire de la base de donnée doit-elle passer par l’autoencodeur</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Renvoie<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Liste des path d’image dans muted_path sous la forme [2][3]</p>

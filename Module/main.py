@@ -159,7 +159,8 @@ def random_img(dir_choice=img_path):
 def created_img(bl=True):
     """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
     2 ligne 3 colonnes
-
+    Args :
+        bl (bool): l'image supplementaire de la base de donnée doit-elle passer par l'autoencodeur
     Returns:
         img_lst (list) : Liste des path d'image dans muted_path sous la forme [2][3]
     """
@@ -314,15 +315,13 @@ class Application(ctk.CTk):
             never (True) : Indique si une génération d'image a déjà eu lieu.
             col (3) : Le nombre de colonnes dans le cadre de la photo.
             row (2) : Le nombre de lignes dans le cadre de la photo.
-            photo_frame (dict) : Un dictionnaire représentant le cadre de la photo,
-                                    initialisé avec des valeurs par défaut.
+            photo_frame (dict) : Un dictionnaire représentant le cadre de la photo, initialisé avec des valeurs par défaut.
 
         Méthodes :
             __init__ : Initialise une nouvelle instance de l'application avec des valeurs par défaut.
             info : Affiche les informations de l'application.
             make_frame : Crée le cadre de la photo.
-            enter_info : Permet à l'utilisateur d'entrer des informations pour le rapport
-                            d'utilisation de l'application.
+            enter_info : Permet à l'utilisateur d'entrer des informations pour le rapport d'utilisation de l'application.
         """
     size_photo = None
     selected_source = {"thumbnail": "", "source": {}}
