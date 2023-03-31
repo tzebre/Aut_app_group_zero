@@ -51,7 +51,7 @@ if [ $? -ne 0 ]; then
   fi
 else
   echo "Conda est déjà installé" >> $SCRIPT_DIR/out.log
-  printf "\e[0m Conda:\e[1;32m Dèjà installé \e[0m😁\n"
+  printf "\e[0m Conda:\e[1;32m Déjà installé \e[0m😁\n"
 fi
 if [[ $(uname) == "Darwin" ]]; then
   env="env.yml"
