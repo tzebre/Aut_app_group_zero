@@ -2,9 +2,9 @@
 #SCRIPT_DIR=$(dirname "$SCRIPT")
 #replace by path
 #alias app_auth="source PATH/info_7/execution.sh"
-SE_=$(cat /Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7/.ASCII.txt)
-printf ${SE_}
 SCRIPT_DIR="/Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7"
+SE_=$(cat $SCRIPT_DIR/.ASCII.txt)
+printf ${SE_}
 CPU=$(sysctl -n machdep.cpu.brand_string)
 MEMORY=$(sysctl -n hw.memsize)
 Os_=$(uname)
