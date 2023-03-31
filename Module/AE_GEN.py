@@ -190,8 +190,8 @@ def save_modified_img(pop):
     if not os.path.exists('.img'):
         os.makedirs('.img')
     else:
-        shutil.rmtree('.img',onerror=remove_readonly)
-        os.makedirs('.img')
+        os.system("chmod 777 .img/*")
+        os.system("rm -f .img/*")
 
     for i in range(pop.shape[0]):
         plt.imshow(pop[i])
@@ -212,7 +212,7 @@ def main_genetic_algorithm(encoder, decoder):
     images=implement_img(encoder)
 
     nb_images = len(images)
-    if nb_images == 64 :
+    if nb_images == 128 :
         images = [images]
         nb_images = len(images)
 

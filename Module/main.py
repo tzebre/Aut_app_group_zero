@@ -165,7 +165,11 @@ def created_img(bl=True):
     Returns:
         img_lst (list) : Liste des path d'image dans muted_path sous la forme [2][3]
     """
-    files = os.listdir(muted_path)
+    liste = os.listdir(muted_path)
+    files = []
+    for l in liste:
+        if l[0] != '.':
+            files.append(l)
     for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
     path = random_img()
