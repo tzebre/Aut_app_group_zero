@@ -804,9 +804,6 @@ if __name__ == '__main__':
         else:
             shutil.rmtree(dir_path)
             os.makedirs(dir_path)
-    old_stdout = sys.stdout
-    log_file = open("../message.log", "w")
-    sys.stdout = log_file
     global encoder
     global decoder
     encoder, decoder = main_autocodeur()
@@ -816,6 +813,4 @@ if __name__ == '__main__':
     # Set it as the window icon.
     app.iconphoto(True, icon)
     app.mainloop()
-    print("End")
-    sys.stdout = old_stdout
-    log_file.close()
+    print("Application closed")

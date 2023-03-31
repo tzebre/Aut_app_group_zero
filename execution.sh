@@ -97,6 +97,6 @@ rm $SCRIPT_DIR/.comp_tmp.txt
 cd $SCRIPT_DIR/Module
 echo "##Execution de l'app##" >> $SCRIPT_DIR/out.log
 printf "Execution du code Python ... 🐍\n"
-python3 main.py >> $SCRIPT_DIR/out.log 2>/dev/null
+python3 main.py >> $SCRIPT_DIR/out.log
 cd -
 printf "Merci d'avoir utilisé AUTHETIFICATOR à bientot.\nGroup_zero à votre service 🫡\n"
