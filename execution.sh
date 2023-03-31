@@ -1,3 +1,4 @@
+#!usr/bin
 SCRIPT=$(readlink -f "$_")
 SCRIPT_DIR=$(dirname "$SCRIPT")
 conda >/dev/null
@@ -42,11 +43,6 @@ if [ $? -eq 0 ]; then
     echo "L'environnement n'est pas correctement chargé"
     conda activate base
     conda remove -n Enviro_group_zero --all
-  fi
-  if [ $? -eq 0 ]; then
-    echo "L'environnement est correctement chargé"
-  else
-    echo "L'environnement n'est pas correctement chargé"
   fi
 fi
 conda info --envs | grep "Enviro_group_zero" >/dev/null
