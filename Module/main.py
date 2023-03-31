@@ -792,14 +792,13 @@ class Application(ctk.CTk):
         export_pdf(self.value, h, c, b)
 
 
-for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    else:
-        shutil.rmtree(dir_path)
-        os.makedirs(dir_path)
-
 if __name__ == '__main__':
+    for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        else:
+            shutil.rmtree(dir_path)
+            os.makedirs(dir_path)
     old_stdout = sys.stdout
     log_file = open("../message.log", "w")
     sys.stdout = log_file
