@@ -1,4 +1,4 @@
-import os
+import os, stat
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 from PIL import Image
@@ -176,6 +176,10 @@ def crossing_over(data_encoded, Tc):
 
     return list_img
 
+def remove_readonly(func, path, _):
+    "Clear the readonly bit and reattempt the removal"
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
 
 def save_modified_img(pop):
     '''Sauvegarde les images au format PNG
@@ -186,7 +190,7 @@ def save_modified_img(pop):
     if not os.path.exists('.img'):
         os.makedirs('.img')
     else:
-        shutil.rmtree('.img')
+        shutil.rmtree('.img',onerror=remove_readonly)
         os.makedirs('.img')
 
     for i in range(pop.shape[0]):
