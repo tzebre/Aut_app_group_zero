@@ -49,7 +49,7 @@ if [ $? -eq 0 ]; then
 fi
 conda info --envs | grep "Enviro_group_zero" > /dev/null
 if [ $? -ne 0 ]; then
-    conda env create -n Enviro_group_zero  --file env.yml
+    conda env create -f env.yml
     if [ $? -eq 0 ]; then
         echo "L'environnement a été créé succès"
         conda activate Enviro_group_zero

@@ -1,4 +1,4 @@
-name: test
+name: Enviro_group_zero
 channels:
   - defaults
 dependencies:
@@ -126,4 +126,4 @@ dependencies:
     - qrcode==7.4.2
     - reportlab==3.6.12
     - zipp==3.15.0
-prefix: /opt/anaconda3/envs/test
+prefix: Enviro_group_zero
