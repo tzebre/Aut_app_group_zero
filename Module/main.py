@@ -16,6 +16,7 @@ from math import ceil, sqrt
 from datetime import datetime
 import json
 from tkinter.filedialog import asksaveasfile
+import sys
 
 img_path = ".data/00000/"
 last_path = ".past/"
@@ -168,7 +169,7 @@ def created_img(bl=True):
     for i, f in enumerate(files):
         files[i] = f"{muted_path}{f}"
     path = random_img()
-    autocoded = autocode(path,encoder, decoder, bl)
+    autocoded = autocode(path, encoder, decoder, bl)
     files.append(autocoded)
     arr_img = np.array(files)
     img_lst = arr_img.reshape(2, 3)
@@ -224,6 +225,7 @@ class Pastchoice(ctk.CTkScrollableFrame):
             add_img : Ajoute une image à l'interface graphique sous forme de bouton avec un texte et un compteur.
             go_past : Efface tous les boutons d'images qui se trouvent après le bouton sélectionné.
     """
+
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self.count = 0  # Nombre de generation précédentes
@@ -798,12 +800,18 @@ for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
         os.makedirs(dir_path)
 
 if __name__ == '__main__':
+    old_stdout = sys.stdout
+    log_file = open("../message.log", "w")
+    sys.stdout = log_file
     global encoder
     global decoder
-    encoder , decoder = main_autocodeur()
+    encoder, decoder = main_autocodeur()
     app = Application()
     # Load the image file from disk.
     icon = tk.PhotoImage(file=".source/logo.png")
     # Set it as the window icon.
     app.iconphoto(True, icon)
     app.mainloop()
+    print("End")
+    sys.stdout = old_stdout
+    log_file.close()
