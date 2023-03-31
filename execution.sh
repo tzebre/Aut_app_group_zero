@@ -26,9 +26,9 @@ else
   echo "Conda est déjà installé"
 fi
 if [ $expr $Distrib = 'Darwin' ]; then
-  env = env.yml
+  env=env.yml
 else
-  env = env_linux.yml
+  env=env_linux.yml
 fi
 conda info --envs | grep "Enviro_group_zero" >/dev/null
 if [ $? -eq 0 ]; then
