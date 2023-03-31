@@ -797,6 +797,7 @@ class Application(ctk.CTk):
 
 
 if __name__ == '__main__':
+    #TODO LOG ET DOC
     for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
