@@ -22,7 +22,7 @@ Un path apparaît :![image](https://user-images.githubusercontent.com/111517884/
 Il sert à créer un alias qui permettra de lancer l'application à l'aide d'une simple commande depuis n'importe où dans votre terminal. Copier le path alias : alias auth_app='source /Users/bacquiecamille/Documents/camille/4BIM/DVPT_logiciel/Aut_app_group_zero/execution.sh'
 
 - 3. Ouvrer votre fichier  configuration shell (ici *.zshrc*)  : ```open ~/.zshrc```
-Une fenêtre *.zshrc* s'ouvre. Descendre au niveau de la section *#Example aliases* et coller le path alias : ![image](https://user-images.githubusercontent.com/111517884/229459723-ddabdea6-b8bc-4982-a7fb-c829b4699d46.png)
+Une fenêtre *.zshrc* s'ouvre. Descendre au niveau de la section *#Example aliases* et coller le path alias : ![image](https://user-images.githubusercontent.com/111517884/229460367-4777580b-c222-4c82-a295-0fa0f9f0e472.png)
 
 Sauvegarder et fermer le fichier .zshrc.
 
