@@ -23,9 +23,9 @@ last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
 dir_cache = ".cache/"
-fun = False  # Fun mode
+fun = False# Fun mode
 json_make = False # Make a json recap
-db_autocoded = False # Autoencode les images de la database
+db_autocoded = True # Autoencode les images de la database
 f = open('../params.json')
 
 # returns JSON object as
@@ -793,11 +793,12 @@ class Application(ctk.CTk):
             longeur = len(line)
             ll = len(word)
             if longeur + ll >= 25:
-                new_txt.append(f" {line}")
+                new_txt.append(line)
                 line_count += 1
                 line = word
             else:
-                line += word
+                line += f" {word}"
+        new_txt.append(line)
         self.value["remarque_photo"] = new_txt
         export_pdf(self.value, h, c, b)
 

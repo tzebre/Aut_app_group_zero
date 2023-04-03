@@ -47,7 +47,7 @@ def main_pdf(value, path, dest = "report.pdf"):
     output_stream.close()
 
 def make_qr(id):
-    img = qrcode.make(f"Lien vers la database avec l'id : {id}")
+    img = qrcode.make(f"Lien vers la database avec l'id : {id}, https://media.licdn.com/dms/image/C4E03AQH8p70CanX6Jg/profile-displayphoto-shrink_100_100/0/1651235879742?e=1686182400&v=beta&t=0X1zWeQfybP_uWGXbe7BE3IaCFikBlchUv-IDZvLkuE")
     img.save('qr_code.png')
 
 
