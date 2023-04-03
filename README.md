@@ -14,7 +14,7 @@ Sommaire :
 ### Installation, à faire lors de la première ouverture uniquement : 
 
 - 1. Ouvrir le terminal , aller dans le dossier *Aut_app_group_zero* : 
-``` cd info_7 ```
+``` cd Aut_app_group_zero ```
 
 - 2. Lancer le script .sh : 
 ```sh .instal/make_alias.sh ```
