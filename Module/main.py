@@ -24,10 +24,16 @@ muted_path = ".img/"
 past_temp = ".past_temp/"
 dir_cache = ".cache/"
 fun = False  # Fun mode
+json_make = False # Make a json recap
+db_autocoded = False # autocode les images de la database
+f = open('../params.json')
 
-H = 128  # Hauteur des images
-W = 128  # Largeur des images
-C = 3  # 3 si RGB 1 si N&B
+# returns JSON object as
+# a dictionary
+params = json.load(f)
+H = params["H"]  # Hauteur des images
+W = params["W"]  # Largeur des images
+C = params["C"]  # 3 si RGB 1 si N&B
 
 
 def rdm_le(x: int, majuscule: bool) -> str:
@@ -157,7 +163,7 @@ def random_img(dir_choice=img_path):
     return random_image
 
 
-def created_img(bl=True):
+def created_img(bl=db_autocoded):
     """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
     2 ligne 3 colonnes
     Args :
@@ -764,7 +770,7 @@ class Application(ctk.CTk):
         self.remarque_txt = tk.Text(rem)
         self.remarque_txt.grid(row=0, column=0, sticky="nsew")
         val_btn = ctk.CTkButton(rem, text="Validation",
-                                command=lambda h=hist_, c=coupable_, b=True: self.call_export(h, c, b))
+                                command=lambda h=hist_, c=coupable_, b=json_make: self.call_export(h, c, b))
         val_btn.grid(row=1, column=0)
 
     def call_export(self, h, c, b):
