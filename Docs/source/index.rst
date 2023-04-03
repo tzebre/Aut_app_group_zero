@@ -10,7 +10,6 @@ Welcome to Group_zero's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   Intro 
    modules
 
 Indices and tables

@@ -42,8 +42,6 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Intro.html">Groupe Zero</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Intro.html#objectif">Objectif</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Progamme</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-AE_GEN">AE_GEN module</a><ul>
@@ -125,17 +123,18 @@
 <dt class="sig sig-object py" id="AE_GEN.crossing_over">
 <span class="sig-prename descclassname"><span class="pre">AE_GEN.</span></span><span class="sig-name descname"><span class="pre">crossing_over</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AE_GEN.crossing_over" title="Lien permanent vers cette définition"></a></dt>
 <dd><p>Partie de l’algorithme génétique qui va permettre de réaliser des crossing over</p>
-<dl class="simple">
-<dt>Args :</dt><dd><p>data_encoded (float[]): liste d’images encodées sous forme de vecteur de taille 128.
-Tc (float): probabilité d’avoir un crossing over.</p>
-</dd>
-</dl>
 <dl class="field-list simple">
-<dt class="field-odd">Renvoie<span class="colon">:</span></dt>
-<dd class="field-odd"><p>liste d’images encodées modifiées</p>
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_encoded</strong> (<em>float</em><em>[</em><em>]</em>) – liste d’images encodées sous forme de vecteur de taille 128.</p></li>
+<li><p><strong>Tc</strong> (<em>float</em>) – probabilité d’avoir un crossing over.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Type renvoyé<span class="colon">:</span></dt>
-<dd class="field-even"><p>list_img (float[])</p>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>liste d’images encodées modifiées</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list_img (float[])</p>
 </dd>
 </dl>
 </dd></dl>
@@ -188,18 +187,19 @@ Decode les images et les enregistre dans un dossier pour être lu par l’interf
 <dt class="sig sig-object py" id="AE_GEN.mutation">
 <span class="sig-prename descclassname"><span class="pre">AE_GEN.</span></span><span class="sig-name descname"><span class="pre">mutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proba</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AE_GEN.mutation" title="Lien permanent vers cette définition"></a></dt>
 <dd><p>Partie de l’algorithme génétique qui va permettre de réaliser des SNP aléatoirement</p>
-<dl class="simple">
-<dt>Args :</dt><dd><p>data_encoded (float[]): liste d’images encodées sous forme de vecteur de taille 128.
-proba (float): probabilité d’avoir une mutation.
-ratio (float, optional): coefficient multiplicateur pour réduir l’effet de la mutation, par défaut le ratio vaut 1.</p>
-</dd>
-</dl>
 <dl class="field-list simple">
-<dt class="field-odd">Renvoie<span class="colon">:</span></dt>
-<dd class="field-odd"><p>liste d’images encodées modifiées</p>
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_encoded</strong> (<em>float</em><em>[</em><em>]</em>) – liste d’images encodées sous forme de vecteur de taille 128.</p></li>
+<li><p><strong>proba</strong> (<em>float</em>) – probabilité d’avoir une mutation.</p></li>
+<li><p><strong>ratio</strong> (<em>float</em><em>, </em><em>optional</em>) – coefficient multiplicateur pour réduir l’effet de la mutation, par défaut le ratio vaut 1.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Type renvoyé<span class="colon">:</span></dt>
-<dd class="field-even"><p>list_img (float[])</p>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>liste d’images encodées modifiées</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list_img (float[])</p>
 </dd>
 </dl>
 </dd></dl>
@@ -285,9 +285,8 @@ d’application.</p>
 <dt class="field-odd">Paramètres<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>coords</strong> (<em>tuple</em>) – Les coordonnées du bouton de photo cliqué.</p>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Returns :</dt><dd><p>None</p>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -630,10 +629,8 @@ go_past : Efface tous les boutons d’images qui se trouvent après le bouton s�
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">created_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.created_img" title="Lien permanent vers cette définition"></a></dt>
 <dd><p>Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
 2 ligne 3 colonnes
-Args :</p>
-<blockquote>
-<div><p>bl (bool): l’image supplementaire de la base de donnée doit-elle passer par l’autoencodeur</p>
-</div></blockquote>
+:param bl: l’image supplementaire de la base de donnée doit-elle passer par l’autoencodeur
+:type bl: bool</p>
 <dl class="field-list simple">
 <dt class="field-odd">Renvoie<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Liste des path d’image dans muted_path sous la forme [2][3]</p>
@@ -758,9 +755,11 @@ h: Hauteur de frame</p>
 <li><p><strong>majuscule</strong> (<em>bool</em>) – Si True, les lettres générées sont en majuscules. Sinon, elles sont en minuscules.</p></li>
 </ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Returns :</dt><dd><p>str : La chaîne de caractères générée.</p>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>La chaîne de caractères générée.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
