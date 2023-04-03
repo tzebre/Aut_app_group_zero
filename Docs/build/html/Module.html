@@ -122,7 +122,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="AE_GEN.crossing_over">
 <span class="sig-prename descclassname"><span class="pre">AE_GEN.</span></span><span class="sig-name descname"><span class="pre">crossing_over</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AE_GEN.crossing_over" title="Lien permanent vers cette définition"></a></dt>
-<dd><p>Partie de l’algorithme génétique qui va permettre de réaliser des crossing over</p>
+<dd><p>Partie de l’algorithme génétique qui va permettre de réaliser des crossing-over</p>
 <dl class="field-list simple">
 <dt class="field-odd">Paramètres<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -142,7 +142,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="AE_GEN.generate_initial_pop">
 <span class="sig-prename descclassname"><span class="pre">AE_GEN.</span></span><span class="sig-name descname"><span class="pre">generate_initial_pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#AE_GEN.generate_initial_pop" title="Lien permanent vers cette définition"></a></dt>
-<dd><p>Génerer une population à partir du nombre d’image qui ont été sélectionnées et instanciation des probabilités de mutation et crossing over</p>
+<dd><p>Générer une population à partir du nombre d’images qui ont été sélectionnées et instanciation des probabilités de mutation et crossing over</p>
 <dl class="field-list simple">
 <dt class="field-odd">Paramètres<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>list_img</strong> (<em>float</em><em>[</em><em>]</em>) – liste d’images encodées sous forme de vecteur de taille 128.</p>
@@ -317,7 +317,7 @@ d’application.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="main.Application.end">
 <span class="sig-name descname"><span class="pre">end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.Application.end" title="Lien permanent vers cette définition"></a></dt>
-<dd><p>Vérifie si des coupables ont été sélectionnés dans les 6 proposé et appelle la méthode end_in() si c’est
+<dd><p>Vérifie si des coupables ont été sélectionnés dans les 6 proposés et appellent la méthode end_in() si c’est
 le cas, sinon appelle la méthode end_out().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Renvoie<span class="colon">:</span></dt>
@@ -407,7 +407,7 @@ La frame « left » contient un widget « Pastchoice » qui permet à l’ut
 déjà traitées.
 La frame « right » contient une sous-frame « top » et une sous-frame « btm ». La sous-frame « top » est utilisée
 pour afficher les images
-traitées et la sous-frame « btm » contient un slider, un label et un bouton de validation.</p>
+traitées et la sous-frame « btm » contiennent un slider, un label et un bouton de validation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Renvoie<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -524,13 +524,13 @@ cliqué.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="main.Make_thumbnail">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">Make_thumbnail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.Make_thumbnail" title="Lien permanent vers cette définition"></a></dt>
-<dd><p>Crée un assemblage de la liste d’images spécifiée par leurs path et la sauvegarde dans un fichier
+<dd><p>Crée un assemblage de la liste d’images spécifiée par leurs paths et la sauvegarde dans un fichier
 nommé « thumbnailed.png ».</p>
 <dl class="field-list simple">
 <dt class="field-odd">Paramètres<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>list_img</strong> (<em>list</em>) – Une liste d’images à utiliser pour créer la miniature.</p></li>
-<li><p><strong>color</strong> (<em>int</em>) – valeur des pixels par défauts</p></li>
+<li><p><strong>color</strong> (<em>int</em>) – valeur des pixels par défaut</p></li>
 </ul>
 </dd>
 <dt class="field-even">Renvoie<span class="colon">:</span></dt>
@@ -592,7 +592,7 @@ go_past : Efface tous les boutons d’images qui se trouvent après le bouton s�
 <dl class="py function">
 <dt class="sig sig-object py" id="main.change_temp">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">change_temp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.past_temp/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.past_temp/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.change_temp" title="Lien permanent vers cette définition"></a></dt>
-<dd><p>Suprimme les fichiers stocker dans past_temp et place dans ce dossier la derniere generation d’images choisie</p>
+<dd><p>Suprime les fichiers stockés dans past_temp et place dans ce dossier la dernière génération d’images choisie</p>
 <dl class="field-list simple">
 <dt class="field-odd">Paramètres<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -628,8 +628,8 @@ go_past : Efface tous les boutons d’images qui se trouvent après le bouton s�
 <dt class="sig sig-object py" id="main.created_img">
 <span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">created_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.created_img" title="Lien permanent vers cette définition"></a></dt>
 <dd><p>Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
-2 ligne 3 colonnes
-:param bl: l’image supplementaire de la base de donnée doit-elle passer par l’autoencodeur
+2 lignes 3 colonnes
+:param bl: l’image supplémentaire de la base de donnée doit-elle passer par l’autoencodeur
 :type bl: bool</p>
 <dl class="field-list simple">
 <dt class="field-odd">Renvoie<span class="colon">:</span></dt>
