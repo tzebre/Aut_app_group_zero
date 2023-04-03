@@ -120,7 +120,7 @@ def generate_initial_pop(list_img, N):
 def mutation(data_encoded,proba,ratio=1):
     '''Partie de l'algorithme génétique qui va permettre de réaliser des SNP aléatoirement
 
-    Args :
+    Args:
         data_encoded (float[]): liste d'images encodées sous forme de vecteur de taille 128.
         proba (float): probabilité d'avoir une mutation.
         ratio (float, optional): coefficient multiplicateur pour réduir l'effet de la mutation, par défaut le ratio vaut 1.
@@ -152,7 +152,7 @@ def mutation(data_encoded,proba,ratio=1):
 def crossing_over(data_encoded, Tc):
     '''Partie de l'algorithme génétique qui va permettre de réaliser des crossing over
 
-    Args :
+    Args:
         data_encoded (float[]): liste d'images encodées sous forme de vecteur de taille 128.
         Tc (float): probabilité d'avoir un crossing over.
 

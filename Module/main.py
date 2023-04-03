@@ -44,7 +44,7 @@ def rdm_le(x: int, majuscule: bool) -> str:
             x (int): Longueur de la chaîne de caractères à générer.
             majuscule (bool): Si True, les lettres générées sont en majuscules. Sinon, elles sont en minuscules.
 
-        Returns :
+        Returns:
             str : La chaîne de caractères générée.
         """
     if majuscule:
@@ -166,7 +166,7 @@ def random_img(dir_choice=img_path):
 def created_img(bl=db_autocoded):
     """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
     2 ligne 3 colonnes
-    Args :
+    Args:
         bl (bool): l'image supplementaire de la base de donnée doit-elle passer par l'autoencodeur
     Returns:
         img_lst (list) : Liste des path d'image dans muted_path sous la forme [2][3]
@@ -509,7 +509,7 @@ class Application(ctk.CTk):
                 Args:
                     coords (tuple): Les coordonnées du bouton de photo cliqué.
 
-                Returns :
+                Returns:
                     None
         """
         r = coords[0]
