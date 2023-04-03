@@ -1,8 +1,9 @@
+SCRIPT_DIR='/Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7'
 #SCRIPT=$(readlink -f "$_")
 #SCRIPT_DIR=$(dirname "$SCRIPT")
 #replace by path
 #alias app_auth="source PATH/info_7/execution.sh"
-SCRIPT_DIR="/Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7"
+#SCRIPT_DIR="/Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7"
 cat $SCRIPT_DIR/.ASCII.txt
 CPU=$(sysctl -n machdep.cpu.brand_string 2>/dev/null)
 MEMORY=$(sysctl -n hw.memsize 2>/dev/null)
