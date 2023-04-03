@@ -703,7 +703,7 @@ class Application(ctk.CTk):
             self.Subselect_top(source)
         else:
             Application.report["end"] = source
-            Application.report["history"] = source  # peut etre mettre aucune ?
+            Application.report["history"] = get_history()
             self.save_coupable()
 
     def end_out(self):
@@ -787,7 +787,7 @@ class Application(ctk.CTk):
             longeur = len(line)
             ll = len(word)
             if longeur + ll >= 25:
-                new_txt.append(line)
+                new_txt.append(f" {line}")
                 line_count += 1
                 line = word
             else:
@@ -797,7 +797,6 @@ class Application(ctk.CTk):
 
 
 if __name__ == '__main__':
-    #TODO LOG ET DOC
     for dir_path in [last_path, muted_path, past_temp, muted_path, dir_cache]:
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
