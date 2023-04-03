@@ -79,7 +79,7 @@ def implement_img(encoder):
 
 
 def generate_initial_pop(list_img, N):
-    """Génerer une population à partir du nombre d'image qui ont été sélectionnées et instanciation des probabilités de mutation et crossing over 
+    """Générer une population à partir du nombre d'images qui ont été sélectionnées et instanciation des probabilités de mutation et crossing over
 
     Args:
         list_img (float[]): liste d'images encodées sous forme de vecteur de taille 128.
@@ -150,7 +150,7 @@ def mutation(data_encoded,proba,ratio=1):
 
 
 def crossing_over(data_encoded, Tc):
-    '''Partie de l'algorithme génétique qui va permettre de réaliser des crossing over
+    '''Partie de l'algorithme génétique qui va permettre de réaliser des crossing-over
 
     Args:
         data_encoded (float[]): liste d'images encodées sous forme de vecteur de taille 128.

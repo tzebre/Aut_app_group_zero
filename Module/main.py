@@ -88,12 +88,12 @@ def export_pdf(value, hist_list, end_path, json_):
 
 
 def Make_thumbnail(list_img, color=0):
-    """Crée un assemblage de la liste d'images spécifiée par leurs path et la sauvegarde dans un fichier
+    """Crée un assemblage de la liste d'images spécifiée par leurs paths et la sauvegarde dans un fichier
     nommé "thumbnailed.png".
 
     Args:
         list_img (list): Une liste d'images à utiliser pour créer la miniature.
-        color (int): valeur des pixels par défauts
+        color (int): valeur des pixels par défaut
 
     Returns:
         str: Le chemin du fichier "thumbnailed.png" créé.
@@ -137,7 +137,7 @@ def init_dict(nb_row, nb_col):
 
 
 def change_temp(files, dir_clean=past_temp, dir_dest=past_temp):
-    """Suprimme les fichiers stocker dans past_temp et place dans ce dossier la derniere generation d'images choisie
+    """Suprime les fichiers stockés dans past_temp et place dans ce dossier la dernière génération d'images choisie
 
     Args:
         files (list) : Liste avec les paths des images de la derniere generation
@@ -165,9 +165,9 @@ def random_img(dir_choice=img_path):
 
 def created_img(bl=db_autocoded):
     """Recupere dans files la liste des path des images dans muted_path. Reforme la liste sous la forme
-    2 ligne 3 colonnes
+    2 lignes 3 colonnes
     Args:
-        bl (bool): l'image supplementaire de la base de donnée doit-elle passer par l'autoencodeur
+        bl (bool): l'image supplémentaire de la base de donnée doit-elle passer par l'autoencodeur
     Returns:
         img_lst (list) : Liste des path d'image dans muted_path sous la forme [2][3]
     """
@@ -440,7 +440,7 @@ class Application(ctk.CTk):
             déjà traitées.
             La frame "right" contient une sous-frame "top" et une sous-frame "btm". La sous-frame "top" est utilisée
             pour afficher les images
-            traitées et la sous-frame "btm" contient un slider, un label et un bouton de validation.
+            traitées et la sous-frame "btm" contiennent un slider, un label et un bouton de validation.
 
             Returns:
                 None
@@ -732,7 +732,7 @@ class Application(ctk.CTk):
 
     def end(self):
         """
-            Vérifie si des coupables ont été sélectionnés dans les 6 proposé et appelle la méthode end_in() si c'est
+            Vérifie si des coupables ont été sélectionnés dans les 6 proposés et appellent la méthode end_in() si c'est
             le cas, sinon appelle la méthode end_out().
 
             Returns:
