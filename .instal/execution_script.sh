@@ -1,4 +1,3 @@
-SCRIPT_DIR='/Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7'
 #SCRIPT=$(readlink -f "$_")
 #SCRIPT_DIR=$(dirname "$SCRIPT")
 #replace by path
@@ -79,7 +78,7 @@ fi
 conda info --envs | grep "Enviro_group_zero" >/dev/null
 if [ $? -ne 0 ]; then
   echo "Creation de l'environement python 🐍⚒️"
-  conda env create -f $SCRIPT_DIR/$env | tee -a $SCRIPT_DIR/out.log #tej les print degeux de la console
+  conda env create -f $SCRIPT_DIR/$env >> $SCRIPT_DIR/out.log #tej les print degeux de la console
   conda info --envs | grep "Enviro_group_zero" >/dev/null
   if [ $? -eq 0 ]; then
     echo "L'environnement a été créé succès" >> $SCRIPT_DIR/out.log
