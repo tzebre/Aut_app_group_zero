@@ -25,7 +25,7 @@ past_temp = ".past_temp/"
 dir_cache = ".cache/"
 fun = False  # Fun mode
 json_make = False # Make a json recap
-db_autocoded = False # autocode les images de la database
+db_autocoded = False # Autoencode les images de la database
 f = open('../params.json')
 
 # returns JSON object as
