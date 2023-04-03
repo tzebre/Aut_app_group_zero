@@ -13,16 +13,17 @@ Sommaire :
 
 ### Installation, à faire lors de la première ouverture uniquement : 
 
-- 1. Ouvrir le terminal , aller dans le dossier *info_7* : 
-``` cd info_7 ```
+- 1. Ouvrir le terminal , aller dans le dossier *Aut_app_group_zero* : 
+``` cd Aut_app_group_zero ```
 
 - 2. Lancer le script .sh : 
 ```sh .instal/make_alias.sh ```
-Un path apparaît :![image](https://user-images.githubusercontent.com/111517884/229445554-e8b9cbd7-09f7-4085-bae4-6013f8c97c84.png)
-Il sert à créer un alias qui permettra de lancer l'application à l'aide d'une simple commande depuis n'importe où dans votre terminal. Copier le path alias : alias auth_app='source /Users/bacquiecamille/Documents/camille/4BIM/DVPT_logiciel/info_7/execution.sh'
+Un path apparaît :![image](https://user-images.githubusercontent.com/111517884/229459436-4d60c62f-acc4-4189-ac36-9931be5e3f61.png)
+Il sert à créer un alias qui permettra de lancer l'application à l'aide d'une simple commande depuis n'importe où dans votre terminal. Copier le path alias : alias auth_app='source /Users/bacquiecamille/Documents/camille/4BIM/DVPT_logiciel/Aut_app_group_zero/execution.sh'
 
 - 3. Ouvrer votre fichier  configuration shell (ici *.zshrc*)  : ```open ~/.zshrc```
-Une fenêtre *.zshrc* s'ouvre. Descendre au niveau de la section *#Example aliases* et coller le path alias : ![image](https://user-images.githubusercontent.com/111517884/229446592-bf3d6002-c3bf-4f96-b6fb-9bbd8a02b491.png)
+Une fenêtre *.zshrc* s'ouvre. Descendre au niveau de la section *#Example aliases* et coller le path alias : ![image](https://user-images.githubusercontent.com/111517884/229460367-4777580b-c222-4c82-a295-0fa0f9f0e472.png)
+
 Sauvegarder et fermer le fichier .zshrc.
 
 - 4. Retour sur le terminal: entrer la commande suivante : ```source ~/.zshrc``` puis ```auth_app``` .
@@ -77,20 +78,20 @@ Le code QR renvoie vers le lien de la database utilisée.
 
 ## Options supplémentaires : 
 
-Dans le dossier *info_7* un fichier *out.log* est crée. Il retrace l'installation de l'application ainsi que l'exécution. Si un problème apparaît lors de l'utilisation, les codes erreur seront inscrits dans ce fichier. Veuillez nous envoyer ce fichier par mail pour que nous puissons corriger les erreurs.
+Dans le dossier *Aut_app_group_zero* un fichier *out.log* est crée. Il retrace l'installation de l'application ainsi que l'exécution. Si un problème apparaît lors de l'utilisation, les codes erreur seront inscrits dans ce fichier. Veuillez nous envoyer ce fichier par mail pour que nous puissons corriger les erreurs.
   ![image](https://user-images.githubusercontent.com/111517884/229453407-7b105ca7-b4da-4487-9439-8b298c049eb7.png)
 
 Quelques options sont modifiables : 
-- Dans le dossier *info_7* ouvrir le fichier *params.json* :
+- Dans le dossier *Aut_app_group_zero* ouvrir le fichier *params.json* :
 <img width="478" alt="image" src="https://user-images.githubusercontent.com/111517884/229455370-4cc2d278-2904-4269-9e8c-b9e2d4f911c1.png">
 Vous pouvez alors modifier les paramètres de taille et de couleur (RBG =3, noir et blanc = 1 ) des images que vous utilisez.
 
-- Dans le dossier *info_7/Module* ouvrir le fichier *main.py*. Aux lignes 26, 27 et 28 vous pouvez : 
+- Dans le dossier *Aut_app_group_zero/Module* ouvrir le fichier *main.py*. Aux lignes 26, 27 et 28 vous pouvez : 
  - Activer le fun mode : ```fun = True```  # Fun mode
  - Créer un fichier .json à la fin de l'utilisation de l'application (comme le fichier .pdf mais sans les images) : ```json_make = True``` # Make a json recap
  - Désactiver le passage dans l'auto-encodeur des images ajoutées lors des nouvelles génerations : ```db_autocoded = False``` # Autoencode les images de la database
 
-Une nouvelle version est en préparation, pour plus d'informations voir *info_7/AE_OK_128.html* .
+Une nouvelle version est en préparation, pour plus d'informations voir *Aut_app_group_zero/AE_OK_128.html* .
 
 
 
