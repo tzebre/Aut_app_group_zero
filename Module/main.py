@@ -23,9 +23,9 @@ last_path = ".past/"
 muted_path = ".img/"
 past_temp = ".past_temp/"
 dir_cache = ".cache/"
-fun = False# Fun mode
-json_make = False # Make a json recap
-db_autocoded = True # Autoencode les images de la database
+fun = False  # Fun mode
+json_make = False  # Make a json recap
+db_autocoded = True  # Autoencode les images de la database
 f = open('../params.json')
 
 # returns JSON object as
