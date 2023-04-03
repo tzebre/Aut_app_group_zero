@@ -17,7 +17,7 @@ echo "Version System: $(sw_vers -productVersion)" >> $SCRIPT_DIR/out.log
 echo "CPU: $CPU" >> $SCRIPT_DIR/out.log
 echo "Memory: $MEMORY" >> $SCRIPT_DIR/out.log
 
-Error_txt="Erreur lors du lancement de l'Application.\n Merci d'envoyer le rapport de log à support@group_zero.com. \n Path du rapport :  ${SCRIPT_DIR}/out.log"
+Error_txt="Erreur lors du lancement de l'Application.\n Merci d'envoyer le rapport de log à support@group_zero.com \n Path du rapport :  ${SCRIPT_DIR}/out.log"
 echo ${NE_}
 echo  "Group_zero à votre service 🫡"
 printf "\e[0m Start Authetificator App: \e[1;32m%s\e[0m\n" "$Date_"
@@ -78,7 +78,9 @@ if [ $? -eq 0 ]; then
 fi
 conda info --envs | grep "Enviro_group_zero" >/dev/null
 if [ $? -ne 0 ]; then
-  conda env create -f $SCRIPT_DIR/$env | tee -a $SCRIPT_DIR/out.log
+  echo "Creation de l'environement python 🐍⚒️"
+  conda env create -f $SCRIPT_DIR/$env | tee -a $SCRIPT_DIR/out.log #tej les print degeux de la console
+  conda info --envs | grep "Enviro_group_zero" >/dev/null
   if [ $? -eq 0 ]; then
     echo "L'environnement a été créé succès" >> $SCRIPT_DIR/out.log
     printf "\e[0m Enviro_group_zero:\e[1;32m Creé \e[0m⚒️️️\n"
@@ -89,7 +91,7 @@ if [ $? -ne 0 ]; then
     echo "L'environnement n'a pas été créé" >> $SCRIPT_DIR/out.log
     printf "\e[0m Enviro_group_zero:\e[1;31m Echec de la creation \e[0m😢\n"
     printf ${Error_txt}
-    exit 1
+    exit 0 #fin de merde faut que ca cut le script
   fi
 fi
 
@@ -98,5 +100,6 @@ cd $SCRIPT_DIR/Module
 echo "##Execution de l'app##" >> $SCRIPT_DIR/out.log
 printf "Execution du code Python ... 🐍\n"
 python3 main.py >> $SCRIPT_DIR/out.log
+# shellcheck disable=SC2164
 cd -
 printf "Merci d'avoir utilisé AUTHETIFICATOR à bientot.\nGroup_zero à votre service 🫡\n"
