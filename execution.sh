@@ -3,17 +3,16 @@
 #replace by path
 #alias app_auth="source PATH/info_7/execution.sh"
 SCRIPT_DIR="/Users/theomathieu/Documents/cours/4A/S2/dev_log/code/info_7"
-SE_=$(cat $SCRIPT_DIR/.ASCII.txt)
-printf ${SE_}
-CPU=$(sysctl -n machdep.cpu.brand_string)
-MEMORY=$(sysctl -n hw.memsize)
+cat $SCRIPT_DIR/.ASCII.txt
+CPU=$(sysctl -n machdep.cpu.brand_string 2>/dev/null)
+MEMORY=$(sysctl -n hw.memsize 2>/dev/null)
 Os_=$(uname)
 Dir_=${SCRIPT_DIR}
 Date_=$(date +'%Y-%m-%d %H:%M:%S')
 echo -e "$(date +'%Y-%m-%d\t%H:%M:%S')" > $SCRIPT_DIR/out.log
 echo "App directory: ${SCRIPT_DIR}" >> $SCRIPT_DIR/out.log
-echo "Operating System: $(sw_vers -productName)" >> $SCRIPT_DIR/out.log
-echo "Version System: $(sw_vers -productVersion)" >> $SCRIPT_DIR/out.log
+echo "Operating System: $(sw_vers -productName 2>/dev/null)" >> $SCRIPT_DIR/out.log
+echo "Version System: $(sw_vers -productVersion 2>/dev/null)" >> $SCRIPT_DIR/out.log
 echo "CPU: $CPU" >> $SCRIPT_DIR/out.log
 echo "Memory: $MEMORY" >> $SCRIPT_DIR/out.log
 
@@ -63,8 +62,8 @@ if [ $? -eq 0 ]; then
   echo "Environnement déjà présent" >> $SCRIPT_DIR/out.log
   printf "\e[0m Enviro_group_zero:\e[1;32m Déjà installé \e[0m👍\n"
   conda activate Enviro_group_zero
-  conda list >$SCRIPT_DIR/.comp_tmp.txt
-  cmp $SCRIPT_DIR/.comp_tmp.txt $SCRIPT_DIR/.env.txt
+  conda list >$SCRIPT_DIR/.instal/.comp_tmp.txt
+  cmp $SCRIPT_DIR/.instal/.comp_tmp.txt $SCRIPT_DIR/.instal/.env.txt
   if [ $? -eq 0 ]; then
     echo "L'environnement est correctement chargé" >> $SCRIPT_DIR/out.log
     printf "\e[0m Enviro_group_zero:\e[1;32m Complet \e[0m✅\n"
@@ -85,8 +84,8 @@ if [ $? -ne 0 ]; then
     echo "L'environnement a été créé succès" >> $SCRIPT_DIR/out.log
     printf "\e[0m Enviro_group_zero:\e[1;32m Creé \e[0m⚒️️️\n"
     conda activate Enviro_group_zero
-    conda list >$SCRIPT_DIR/.env.txt
-    conda list >$SCRIPT_DIR/.comp_tmp.txt
+    conda list >$SCRIPT_DIR/.instal/.env.txt
+    conda list >$SCRIPT_DIR/.instal/.comp_tmp.txt
   else
     echo "L'environnement n'a pas été créé" >> $SCRIPT_DIR/out.log
     printf "\e[0m Enviro_group_zero:\e[1;31m Echec de la creation \e[0m😢\n"
@@ -95,7 +94,7 @@ if [ $? -ne 0 ]; then
   fi
 fi
 
-rm $SCRIPT_DIR/.comp_tmp.txt
+rm $SCRIPT_DIR/.instal/.comp_tmp.txt
 cd $SCRIPT_DIR/Module
 echo "##Execution de l'app##" >> $SCRIPT_DIR/out.log
 printf "Execution du code Python ... 🐍\n"
